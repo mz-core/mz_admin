@@ -366,6 +366,7 @@ export function useAdminNui() {
     function onMessage(event: MessageEvent) {
       const data = event.data as NuiMessage
       if (!data || typeof data !== "object") return
+      if (typeof data.locale === "string") dispatch({ type: "locale", locale: data.locale })
 
       switch (data.action) {
         case "theme":
@@ -384,7 +385,7 @@ export function useAdminNui() {
           break
 
         case "openTablet":
-          if (data.model) dispatch({ type: "openTablet", model: data.model })
+          if (data.model) dispatch({ type: "openTablet", model: { ...data.model, locale: data.locale ?? data.model.locale } })
           break
 
         case "tabletView":

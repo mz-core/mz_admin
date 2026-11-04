@@ -35,7 +35,8 @@ expect(client:find("RegisterCommand(Config.Commands.banPlayer or 'ban'", 1, true
 expect(client:find("RegisterCommand(Config.Commands.unbanPlayer or 'unban'", 1, true) == nil, 'mz_admin duplicou comando /unban')
 expect(client:find('function MZAdminBans.PromptRevoke', 1, true) ~= nil, 'prompt publico de unban ausente')
 expect(menu:find('context.banModuleAvailable', 1, true) ~= nil, 'root nao oculta modulo indisponivel')
-expect(menu:find("title = 'Desbanir por Public ID'", 1, true) ~= nil, 'atalho direto de unban ausente no /admin')
+expect(menu:match("title%s*=%s*translate%('menu%.s_[%da-f]+',%s*'Desbanir por Public ID'%)") ~= nil,
+  'atalho localizado de unban ausente no /admin')
 expect(menu:find("MZAdminBans.PromptRevoke()", 1, true) ~= nil, 'atalho de unban nao abre fluxo protegido')
 expect(manifest:find("'client/bans.lua'", 1, true) ~= nil, 'client bans ausente no manifest')
 expect(manifest:find("'server/bans.lua'", 1, true) ~= nil, 'server bans ausente no manifest')

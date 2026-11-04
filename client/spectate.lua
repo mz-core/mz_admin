@@ -82,7 +82,7 @@ local function stopLocal(payload, forceSilent)
   end)
 
   if wasActive and forceSilent ~= true and payload.silent ~= true then
-    notify('Spectate encerrado.', 'inform')
+    notify((type(locale) == 'function' and locale('spectate.s_53bfd9f71554') or 'Spectate encerrado.'), 'inform')
   end
 end
 
@@ -138,8 +138,8 @@ RegisterNetEvent('mz_admin:client:startSpectate', function(payload, switched)
   applyHiddenState()
   updateTarget(payload)
   notify(
-    switched == true and ('Alvo do spectate alterado para ID %d.'):format(payload.target)
-      or ('Espectando ID %d. Use /%s para sair.'):format(
+    switched == true and ((type(locale) == 'function' and locale('spectate.s_aaa7c86a6009') or 'Alvo do spectate alterado para ID %d.')):format(payload.target)
+      or ((type(locale) == 'function' and locale('spectate.s_359bf38d69d5') or 'Espectando ID %d. Use /%s para sair.')):format(
         payload.target,
         Config.SpectateStopCommand or 'specoff'
       ),
@@ -156,11 +156,11 @@ end)
 RegisterCommand(Config.SpectateCommand or 'spectate', function(_, args)
   local targetId = tonumber(args[1])
   if not targetId or targetId <= 0 then
-    notify(('Uso: /%s id'):format(Config.SpectateCommand or 'spectate'), 'error')
+    notify(((type(locale) == 'function' and locale('spectate.s_74431131afde') or 'Uso: /%s id')):format(Config.SpectateCommand or 'spectate'), 'error')
     return
   end
   if MZNoClip and MZNoClip.active == true and MZAdminSpectateClient.active ~= true then
-    notify('Desative o noclip antes de usar spectate.', 'error')
+    notify((type(locale) == 'function' and locale('spectate.s_13cd4d1bf44b') or 'Desative o noclip antes de usar spectate.'), 'error')
     return
   end
   TriggerServerEvent('mz_admin:server:startSpectate', math.floor(targetId))

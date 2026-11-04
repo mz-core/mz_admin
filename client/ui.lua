@@ -368,7 +368,7 @@ local function loadPlayerSelectorPage(query, filter, page, append)
     if ActivePlayerSelector ~= selector or selector.generation ~= generation then return end
     if not ok then
       debugPrint('player selector fetch falhou:', result)
-      result = { items = {}, page = page, pageSize = selector.pageSize, hint = 'Falha ao buscar jogadores.' }
+      result = { items = {}, page = page, pageSize = selector.pageSize, hint = (type(locale) == 'function' and locale('ui_text.s_125047d4c27c') or 'Falha ao buscar jogadores.') }
     end
 
     local normalized = sanitizeSelectorResult(result, page, selector.pageSize)
@@ -509,6 +509,7 @@ end
 local function sendTheme(theme, brand)
   SendNUIMessage({
     action = 'theme',
+    locale = Config.Locale or 'pt-br',
     theme = theme or globalTheme(),
     brand = brand or (cfg()).BrandName or 'MZ Admin'
   })
@@ -533,7 +534,7 @@ function MZAdminUI.Notify(messageOrData, kind, duration, extra)
 
   if nuiReady() then
     sendCurrentTheme()
-    SendNUIMessage({ action = 'notify', data = data })
+    SendNUIMessage({ action = 'notify', locale = Config.Locale or 'pt-br', data = data })
     return true, 'nui'
   end
 
@@ -619,7 +620,7 @@ local function uiOption(option, index)
     index = index,
     type = optionType,
     label = option.label,
-    title = tostring(option.title or option.label or 'Opcao'),
+    title = tostring(option.title or option.label or (type(locale) == 'function' and locale('ui_text.s_b4c5aec54c6b') or 'Opcao')),
     description = option.description,
     icon = option.icon,
     iconColor = option.iconColor,
@@ -661,7 +662,7 @@ local function oxOption(option)
     end
   end
 
-  normalized.title = tostring(normalized.title or 'Opcao')
+  normalized.title = tostring(normalized.title or (type(locale) == 'function' and locale('ui_text.s_b4c5aec54c6b') or 'Opcao'))
 
   if type(option.onSelect) == 'function'
     or trim(option.event) ~= ''
@@ -787,7 +788,7 @@ function MZAdminUI.ShowContext(id)
 
   if shouldUseOx('context') then
     if not contextReady() then
-      MZAdminUI.Notify('ox_lib context indisponivel. Use os comandos como fallback.', 'error')
+      MZAdminUI.Notify((type(locale) == 'function' and locale('ui_text.s_e9afffca9025') or 'ox_lib context indisponivel. Use os comandos como fallback.'), 'error')
       return false, 'ox_lib_context_unavailable'
     end
 
@@ -807,7 +808,7 @@ function MZAdminUI.ShowContext(id)
   ui.headerIcon = ui.headerIcon or inheritedHeaderIcon
   ui.badge = ui.badge or inheritedBadge
   sendTheme(theme, brand)
-  SendNUIMessage({ action = 'openContext', menu = ui })
+  SendNUIMessage({ action = 'openContext', locale = Config.Locale or 'pt-br', menu = ui })
   setFocus(true)
   return true, 'nui'
 end
@@ -867,8 +868,9 @@ local function nuiInputDialog(title, rows, options)
   sendCurrentTheme()
   SendNUIMessage({
     action = 'inputDialog',
+    locale = Config.Locale or 'pt-br',
     requestId = requestId,
-    title = tostring(title or 'Input'),
+    title = tostring(title or (type(locale) == 'function' and locale('ui_text.s_b568d47f2e24') or 'Entrada')),
     rows = type(rows) == 'table' and rows or {},
     options = type(options) == 'table' and options or {}
   })
@@ -884,7 +886,7 @@ end
 
 function MZAdminUI.InputDialog(title, rows, options)
   if shouldUseOx('input') then
-    title = tostring(title or 'Input')
+    title = tostring(title or (type(locale) == 'function' and locale('ui_text.s_b568d47f2e24') or 'Entrada'))
     rows = type(rows) == 'table' and rows or {}
     options = type(options) == 'table' and options or {}
 
@@ -893,7 +895,7 @@ function MZAdminUI.InputDialog(title, rows, options)
     end)
 
     if not ok then
-      MZAdminUI.Notify(('Falha no inputDialog: %s'):format(tostring(result)), 'error')
+      MZAdminUI.Notify(((type(locale) == 'function' and locale('ui_text.s_50d3661439d5') or 'Falha no inputDialog: %s')):format(tostring(result)), 'error')
       return nil, tostring(result)
     end
 
@@ -926,6 +928,7 @@ local function nuiAlertDialog(data)
   sendCurrentTheme()
   SendNUIMessage({
     action = 'alertDialog',
+    locale = Config.Locale or 'pt-br',
     requestId = requestId,
     data = data
   })
@@ -948,7 +951,7 @@ function MZAdminUI.AlertDialog(dataOrTitle, content, options)
     end)
 
     if not ok then
-      MZAdminUI.Notify(('Falha no alertDialog: %s'):format(tostring(result)), 'error')
+      MZAdminUI.Notify(((type(locale) == 'function' and locale('ui_text.s_9f18f1c5d504') or 'Falha no alertDialog: %s')):format(tostring(result)), 'error')
       return nil, tostring(result)
     end
 
@@ -961,7 +964,7 @@ end
 function MZAdminUI.Confirm(title, content, options)
   options = type(options) == 'table' and options or {}
   options.header = options.header or tostring(title or 'Confirmar')
-  options.content = options.content or tostring(content or 'Confirmar acao?')
+  options.content = options.content or tostring(content or (type(locale) == 'function' and locale('ui_text.s_ea94920ee209') or 'Confirmar acao?'))
   options.centered = options.centered ~= false
   options.cancel = options.cancel ~= false
 
@@ -1038,14 +1041,15 @@ function MZAdminUI.PlayerSelector(options)
   sendCurrentTheme()
   SendNUIMessage({
     action = 'openPlayerSelector',
+    locale = Config.Locale or 'pt-br',
     selector = {
       requestId = requestId,
-      title = sanitizeSelectorText(options.title or 'Selecionar jogador', 96),
-      subtitle = sanitizeSelectorText(options.subtitle or 'Online agora; pesquise para localizar Characters offline.', 160),
+      title = sanitizeSelectorText(options.title or (type(locale) == 'function' and locale('ui.select_player') or 'Selecionar jogador'), 96),
+      subtitle = sanitizeSelectorText(options.subtitle or (type(locale) == 'function' and locale('ui_text.s_fc5f059b6e2d') or 'Online agora; pesquise para localizar Characters offline.'), 160),
       brand = sanitizeSelectorText(options.brand or (cfg()).BrandName or 'MZ Admin', 64),
       filters = allowedFilters,
       defaultFilter = defaultFilter,
-      searchPlaceholder = sanitizeSelectorText(options.searchPlaceholder or 'Nome, Character, citizenid ou source...', 128),
+      searchPlaceholder = sanitizeSelectorText(options.searchPlaceholder or (type(locale) == 'function' and locale('ui_text.s_0c7f3df22cc8') or 'Nome, Character, citizenid ou source...'), 128),
       minimumOfflineSearch = math.max(1, math.min(8, math.floor(tonumber(options.minimumOfflineSearch) or 2)))
     }
   })
@@ -1272,7 +1276,7 @@ function MZAdminUI.OpenTablet(model, movementEnabled)
   TextInputFocused = false
   MovementEnabled = movementToggleEnabled() and movementEnabled == true
   NuiFocused = false
-  SendNUIMessage({ action = 'openTablet', model = sanitizeTabletModel(model) })
+  SendNUIMessage({ action = 'openTablet', locale = Config.Locale or 'pt-br', model = sanitizeTabletModel(model) })
   setFocus(true)
   return true
 end
@@ -1303,7 +1307,7 @@ function MZAdminUI.ShowTabletContext(id)
   ui.brand = ui.brand or brand
   ui.headerIcon = ui.headerIcon or inheritedHeaderIcon
   ui.badge = ui.badge or inheritedBadge
-  SendNUIMessage({ action = 'tabletContext', menu = ui })
+  SendNUIMessage({ action = 'tabletContext', locale = Config.Locale or 'pt-br', menu = ui })
   if TabletActive then setFocus(true) end
   return true, 'nui'
 end
@@ -1314,7 +1318,7 @@ end
 
 function MZAdminUI.SetTabletModal(modal)
   if not TabletActive then return false, 'tablet_not_open' end
-  SendNUIMessage({ action = 'tabletModal', modal = sanitizeTabletModal(modal) })
+  SendNUIMessage({ action = 'tabletModal', locale = Config.Locale or 'pt-br', modal = sanitizeTabletModal(modal) })
   return true
 end
 
@@ -1668,7 +1672,7 @@ end, false)
 
 RegisterKeyMapping(
   'mz_admin_ui_movement_toggle',
-  'Abrir/fechar o painel administrativo com movimento livre',
+  (type(locale) == 'function' and locale('ui_text.s_aa2fe1051430') or 'Abrir/fechar o painel administrativo com movimento livre'),
   'keyboard',
   movementToggleKey()
 )

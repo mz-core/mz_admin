@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/locale"
 import { Icon } from "@/components/Icon"
 import { Pill } from "@/components/OptionButton"
 import { Input } from "@/components/ui/input"
@@ -37,9 +38,10 @@ function isTextEntry(element: EventTarget | null) {
 }
 
 function TabletEmpty({ text }: { text?: string }) {
+  const t = useTranslation()
   return (
     <div className="mz-tablet__empty">
-      <span>{text || "Nenhum item."}</span>
+      <span>{text || t("no_item")}</span>
     </div>
   )
 }
@@ -141,6 +143,7 @@ function FlightHome({
   model: AppState["tablet"]["model"]
   onAction: (row: TabletRow, element: HTMLElement) => void
 }) {
+  const t = useTranslation()
   const user = model?.user || {}
   const userName = user.name || "Staff"
   const userRole = user.role || "Staff"
@@ -149,18 +152,18 @@ function FlightHome({
     <>
       <section className="mz-flightCard">
         <header className="mz-flightCard__header">
-          <strong>Sessão administrativa</strong>
+          <strong>{t("session")}</strong>
           <span className="mz-flightCard__headerIcon"><Icon name="info" /></span>
         </header>
         <div className="mz-flightStats">
           <span>Staff: <b>{userName}</b></span>
-          <span>Cargo: <b>{userRole}</b></span>
-          <span>Ações: <b>{rows.length}</b></span>
+          <span>{t("role")}: <b>{userRole}</b></span>
+          <span>{t("actions")}: <b>{rows.length}</b></span>
         </div>
       </section>
       <section className="mz-flightCard">
         <header className="mz-flightCard__header">
-          <strong>Ações rápidas</strong>
+          <strong>{t("quick_actions")}</strong>
           <span className="mz-flightCard__headerIcon"><Icon name="bolt" /></span>
         </header>
         {view.subtitle ? <p className="mz-flightCard__subtitle">{view.subtitle}</p> : null}
@@ -177,7 +180,7 @@ function FlightHome({
               {row.icon ? <span className="mz-flightAction__icon"><Icon name={row.icon} /></span> : null}
               <span>{row.title || ""}</span>
             </button>
-          )) : <TabletEmpty text={view.empty || "Nenhuma ação autorizada."} />}
+          )) : <TabletEmpty text={view.empty || t("no_actions")} />}
         </div>
       </section>
     </>
@@ -217,8 +220,9 @@ function TabletTabs({
   onShow: (button: HTMLButtonElement) => void
   onHide: () => void
 }) {
+  const t = useTranslation()
   return (
-    <nav id="tabletTabs" className="mz-tablet__tabs" aria-label="Seções administrativas">
+    <nav id="tabletTabs" className="mz-tablet__tabs" aria-label={t("sections")}>
       {tabs.map((tab) => (
         <button
           className={`mz-tablet__tab${tab.id === active ? " is-active" : ""}`}
@@ -261,6 +265,7 @@ export function TabletSurface({
   onHideTooltip,
   onInputFocus,
 }: TabletSurfaceProps) {
+  const t = useTranslation()
   const tablet = state.tablet
   const model = tablet.model
   const view = tablet.view
@@ -331,8 +336,8 @@ export function TabletSurface({
                 <span
                   id="tabletCrown"
                   className={`mz-tablet__crown${user.owner === true ? "" : " hidden"}`}
-                  title="Owner"
-                  aria-label="Owner"
+                  title={t("owner")}
+                  aria-label={t("owner")}
                 >
                   {user.owner === true ? <Icon name="crown" /> : null}
                 </span>
@@ -383,8 +388,8 @@ export function TabletSurface({
                 id="tabletBackBtn"
                 className={`mz-icon-btn${backVisible ? "" : " hidden"}`}
                 type="button"
-                title="Voltar"
-                aria-label="Voltar"
+                title={t("back")}
+                aria-label={t("back")}
                 onClick={onBack}
               >
                 <Icon name="arrow-left" />
@@ -400,8 +405,8 @@ export function TabletSurface({
                   type="text"
                   autoComplete="off"
                   spellCheck={false}
-                  aria-label="Buscar na seção"
-                  placeholder="Buscar…"
+                  aria-label={t("search_section")}
+                  placeholder={t("search")}
                   value={tablet.search}
                   onChange={(event) => onSearch(event.target.value)}
                 />
@@ -412,7 +417,7 @@ export function TabletSurface({
               id="tabletFilters"
               className={`mz-tablet__filters${filters.length ? "" : " hidden"}`}
               role="group"
-              aria-label="Filtrar"
+              aria-label={t("filter")}
             >
               {filters.map((filter) => (
                 <button
@@ -432,7 +437,7 @@ export function TabletSurface({
               className={`mz-tablet__rows scrollbar-thin${isGrid ? " is-grid" : ""}`}
             >
               {view?.loading === true ? (
-                <TabletEmpty text="Carregando…" />
+                <TabletEmpty text={t("loading")} />
               ) : view?.tab === "main" ? (
                 <FlightHome
                   view={view}
@@ -458,7 +463,7 @@ export function TabletSurface({
                     )
                   })
                 ) : (
-                  <TabletEmpty text="Nenhuma opção disponível" />
+                  <TabletEmpty text={t("no_options")} />
                 )
               ) : isGrid ? (
                 rows.length
@@ -469,7 +474,7 @@ export function TabletSurface({
                         onPrimary={(target, element) => onRowPrimary(target, view, element)}
                       />
                     ))
-                  : <TabletEmpty text={view?.empty || "Nenhum item."} />
+                  : <TabletEmpty text={view?.empty || t("no_item")} />
               ) : rows.length ? (
                 rows.map((row, index) => (
                   <TabletRowView
@@ -480,7 +485,7 @@ export function TabletSurface({
                   />
                 ))
               ) : (
-                <TabletEmpty text={view?.empty || "Nenhum item."} />
+                <TabletEmpty text={view?.empty || t("no_item")} />
               )}
             </div>
           </main>
@@ -497,7 +502,7 @@ export function TabletSurface({
           <div className="mz-tablet__modalFrame">
             <header className="mz-tablet__modalHeader">
               <div className="mz-tablet__modalTitleWrap">
-                <h2 id="tabletModalTitle" className="mz-tablet__modalTitle">{modal?.title || "Jogador"}</h2>
+                <h2 id="tabletModalTitle" className="mz-tablet__modalTitle">{modal?.title || t("player")}</h2>
                 <p id="tabletModalSubtitle" className={`mz-tablet__modalSubtitle${modal?.subtitle ? "" : " hidden"}`}>
                   {modal?.subtitle || ""}
                 </p>
@@ -506,15 +511,15 @@ export function TabletSurface({
                 id="tabletModalCloseBtn"
                 className="mz-icon-btn"
                 type="button"
-                title="Fechar"
-                aria-label="Fechar"
+                title={t("close")}
+                aria-label={t("close")}
                 onClick={onModalClose}
               >
                 <Icon name="x" />
               </button>
             </header>
             <div className="mz-tablet__modalContent">
-              <nav id="tabletModalTabs" className="mz-tablet__modalTabs scrollbar-thin" aria-label="Seções">
+              <nav id="tabletModalTabs" className="mz-tablet__modalTabs scrollbar-thin" aria-label={t("modal_sections")}>
                 {modal ? renderTabletModalTabs(modal, activeModalTab, onModalTab) : null}
               </nav>
               <div id="tabletModalBody" className="mz-tablet__modalBody scrollbar-thin">
@@ -528,7 +533,7 @@ export function TabletSurface({
                           onButton={(_target, action, args, element) => onModalRowButton(action, args, element)}
                         />
                       ))
-                    : <TabletEmpty text={modalContent.empty || "Nenhum dado disponível."} />
+                    : <TabletEmpty text={modalContent.empty || t("no_data")} />
                   : null}
               </div>
             </div>

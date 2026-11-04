@@ -13,6 +13,7 @@ end
 local menu = read('mz_admin/client/menu.lua')
 local bans = read('mz_admin/client/bans.lua')
 local logs = read('mz_admin/client/admin_logs.lua')
+local en = read('mz_admin/locales/en-us.json')
 
 for _, section in ipairs({
   { id = 'mz_admin:section:vehicles', title = 'Veículos e garagens' },
@@ -21,7 +22,13 @@ for _, section in ipairs({
   { id = 'mz_admin:section:audit', title = 'Auditoria' }
 }) do
   expect(menu:find(section.id, 1, true) ~= nil, 'id de secao ausente: ' .. section.id)
-  expect(menu:find(("title = '%s'"):format(section.title), 1, true) ~= nil, 'titulo de secao ausente: ' .. section.title)
+  local escaped = section.title:gsub('([^%w])', '%%%1')
+  local key = menu:match("title%s*=%s*translate%('(menu%.s_[%da-f]+)',%s*'" .. escaped .. "'%)")
+  if key then
+    expect(en:find('"' .. key:sub(6) .. '"', 1, true) ~= nil, 'traducao ausente: ' .. key)
+  else
+    expect(menu:find(("title = '%s'"):format(section.title), 1, true) ~= nil, 'titulo de secao ausente: ' .. section.title)
+  end
 end
 
 -- Hub e atalhos redundantes foram removidos da navegacao principal.
@@ -50,7 +57,8 @@ expect(
     and logs:find('menu = CurrentParentId', 1, true) ~= nil,
   'logs nao preservam a secao pai'
 )
-expect(menu:find("title = 'Nenhuma area autorizada'", 1, true) ~= nil, 'estado vazio fail-closed ausente')
+expect(menu:match("title%s*=%s*translate%('menu%.s_[%da-f]+',%s*'Nenhuma area autorizada'%)") ~= nil
+  and menu:find('readOnly = true', 1, true) ~= nil, 'estado vazio fail-closed localizado ausente')
 expect(menu:find('HasGlobalPermission', 1, true) == nil, 'menu passou a autorizar no client')
 expect(menu:find('MySQL%.', 1) == nil, 'menu passou a acessar banco')
 

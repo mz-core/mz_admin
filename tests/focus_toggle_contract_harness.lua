@@ -100,7 +100,7 @@ expect(
   'frontend reinicia movimento ao trocar de contexto'
 )
 expect(
-  app:find('state.movement.enabled ? "travar movimento" : "liberar movimento"', 1, true) ~= nil,
+  panel:find('state.movement.enabled ? t("lock_movement") : t("unlock_movement")', 1, true) ~= nil,
   'frontend nao informa corretamente a acao do toggle'
 )
 expect(client:find('HasGlobalPermission', 1, true) == nil, 'renderer recebeu regra de permissao')

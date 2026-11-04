@@ -4,6 +4,7 @@ import { DialogLayer } from "@/components/DialogLayer"
 import { TabletSurface } from "@/components/TabletSurface"
 import { ToastStack } from "@/components/ToastStack"
 import { useAdminNui } from "@/hooks/useAdminNui"
+import { LocaleContext } from "@/lib/locale"
 
 export default function App() {
   const { state, dispatch, handlers } = useAdminNui()
@@ -12,6 +13,7 @@ export default function App() {
   }, [dispatch])
 
   return (
+    <LocaleContext.Provider value={state.locale}>
     <div id="app" className={`app app--${state.theme.position}`}>
       <ContextPanel
         state={state}
@@ -53,5 +55,6 @@ export default function App() {
         onInputFocus={handlers.onInputFocus}
       />
     </div>
+    </LocaleContext.Provider>
   )
 }

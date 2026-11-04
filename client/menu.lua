@@ -1,3 +1,8 @@
+local function translate(key, fallback)
+  local text = type(locale) == 'function' and locale(key) or nil
+  return type(text) == 'string' and text ~= '' and text ~= key and text or fallback
+end
+
 MZAdminMenu = MZAdminMenu or {}
 
 local ROOT_ID = 'mz_admin:root'
@@ -27,7 +32,7 @@ end
 
 local function kickAction(selection)
   selection = type(selection) == 'table' and selection or MZAdminPlayerSelector.Select({
-    title = 'Selecionar jogador para remover',
+    title = translate('menu.s_6deb9058662e', 'Selecionar jogador para remover'),
     allowOffline = false
   })
   local targetId = selection and tonumber(selection.source)
@@ -36,15 +41,15 @@ local function kickAction(selection)
   local rows = {
     {
     type = 'textarea',
-    label = 'Motivo',
+    label = translate('menu.s_cbeec536b2f8', 'Motivo'),
     required = true,
     min = 3,
     max = 256,
-    description = 'O motivo sera registrado antes da remocao.'
+    description = translate('menu.s_29bf4aca84f5', 'O motivo sera registrado antes da remocao.')
     }
   }
 
-  local values = input('Remover player da sessao', rows)
+  local values = input(translate('menu.s_db85c53a23f2', 'Remover player da sessao'), rows)
   if type(values) ~= 'table' then return end
   local reason = tostring(values[1] or ''):gsub('%c', ' '):gsub('^%s+', ''):gsub('%s+$', '')
   if #reason < 3 then return end
@@ -57,8 +62,8 @@ local function kickAction(selection)
 end
 
 local function spawnVehicle()
-  local values = input('Criar veiculo administrativo', {
-    { type = 'input', label = 'Modelo', required = true, min = 1, max = 64 }
+  local values = input(translate('menu.s_66586da0a13d', 'Criar veiculo administrativo'), {
+    { type = 'input', label = translate('menu.s_b3a01bef14b4', 'Modelo'), required = true, min = 1, max = 64 }
   })
   local model = values and tostring(values[1] or '') or ''
   if model == '' then return end
@@ -110,55 +115,55 @@ local function registerSelectedPlayerMenu(payload)
   }
 
   option(options, online and CurrentActions.gotoPlayer, withAction({
-    title = 'Ir ate o player',
-    description = 'O servidor resolve a posicao atual do alvo.',
+    title = translate('menu.s_c5575ce4d6c7', 'Ir ate o player'),
+    description = translate('menu.s_fbf830a00412', 'O servidor resolve a posicao atual do alvo.'),
     icon = 'person-walking-arrow-right'
   }, 'gotoSelectedPlayer', identity))
   option(options, online and CurrentActions.bringPlayer, withAction({
-    title = 'Trazer o player',
-    description = 'O servidor resolve a posicao atual do Staff.',
+    title = translate('menu.s_ebb84a01ae1e', 'Trazer o player'),
+    description = translate('menu.s_ce61ae93edbf', 'O servidor resolve a posicao atual do Staff.'),
     icon = 'people-arrows-left-right'
   }, 'bringSelectedPlayer', identity))
   option(options, online and CurrentActions.kick, withAction({
-    title = 'Remover o player',
-    description = 'Kick protegido por hierarquia e auditoria.',
+    title = translate('menu.s_c147cdf6ea1c', 'Remover o player'),
+    description = translate('menu.s_8815285e811c', 'Kick protegido por hierarquia e auditoria.'),
     icon = 'user-xmark'
   }, 'kickSelectedPlayer', identity))
   option(options, online and CurrentBanGuardReady and CurrentActions.ban, withAction({
-    title = 'Banir o player',
-    description = 'BanGuard persiste identifiers, tokens e auditoria antes de remover.',
+    title = translate('menu.s_e5222ebe5bd0', 'Banir o player'),
+    description = translate('menu.s_98678655fc31', 'BanGuard persiste identifiers, tokens e auditoria antes de remover.'),
     icon = 'user-lock'
   }, 'banSelectedPlayer', identity))
   option(options, online and CurrentWarningsReady and CurrentActions.warningsIssue, withAction({
-    title = 'Aplicar advertencia',
-    description = 'Registra motivo e auditoria sem punicao automatica.',
+    title = translate('menu.s_2c5414ebdd8e', 'Aplicar advertencia'),
+    description = translate('menu.s_41a4ad782653', 'Registra motivo e auditoria sem punicao automatica.'),
     icon = 'triangle-exclamation'
   }, 'warnSelectedPlayer', identity))
   option(options, CurrentWarningsReady and CurrentActions.warningsView, withAction({
-    title = 'Consultar advertencias',
-    description = 'Lista o historico persistente desta conta/Character.',
+    title = translate('menu.s_80e48e6eae94', 'Consultar advertencias'),
+    description = translate('menu.s_b12582373eb7', 'Lista o historico persistente desta conta/Character.'),
     icon = 'list-check'
   }, 'viewSelectedPlayerWarnings', identity))
   option(options, online and CurrentActions.heal, withAction({
-    title = 'Curar o player',
-    description = 'Aplica heal no alvo online.',
+    title = translate('menu.s_4061a4fcfb15', 'Curar o player'),
+    description = translate('menu.s_7e99ff5e7cdd', 'Aplica heal no alvo online.'),
     icon = 'heart-pulse'
   }, 'healSelectedPlayer', identity))
   option(options, online and CurrentActions.revive, withAction({
-    title = 'Reviver o player',
-    description = 'Aplica revive no alvo online.',
+    title = translate('menu.s_bcea19a4cc83', 'Reviver o player'),
+    description = translate('menu.s_43b12c742fd8', 'Aplica revive no alvo online.'),
     icon = 'kit-medical'
   }, 'reviveSelectedPlayer', identity))
   option(options, online and CurrentActions.spectate, withAction({
-    title = 'Espectar o player',
-    description = 'Protegido por hierarquia e retorno seguro.',
+    title = translate('menu.s_3f19ca6ec09b', 'Espectar o player'),
+    description = translate('menu.s_4aefc40744f0', 'Protegido por hierarquia e retorno seguro.'),
     icon = 'binoculars'
   }, 'spectateSelectedPlayer', identity))
 
   if #options == 0 then
     options[1] = {
-      title = 'Nenhuma acao autorizada',
-      description = 'Seu cargo pode consultar o diretorio, mas nao possui uma acao liberada para este jogador.',
+      title = translate('menu.s_5c77b9cdde32', 'Nenhuma acao autorizada'),
+      description = translate('menu.s_cfc52011ff1a', 'Seu cargo pode consultar o diretorio, mas nao possui uma acao liberada para este jogador.'),
       icon = 'lock',
       readOnly = true
     }
@@ -171,7 +176,7 @@ local function registerSelectedPlayerMenu(payload)
   end
   if accountId and CurrentActions.staffManage == true then
     options[#options + 1] = {
-      title = 'Account', description = tostring(accountId), icon = 'id-card', readOnly = true
+      title = translate('router.s_4d07517575be', 'Conta'), description = tostring(accountId), icon = 'id-card', readOnly = true
     }
   end
 
@@ -181,7 +186,7 @@ local function registerSelectedPlayerMenu(payload)
     id = contextId,
     title = playerName,
     subtitle = online and ('Online | Source %d | ping %d ms'):format(targetSource, identity.ping)
-      or 'Offline | Character persistente',
+      or translate('menu.s_ad2c24a73ca1', 'Offline | Character persistente'),
     badge = online and 'ONLINE' or 'OFFLINE',
     badgeVariant = online and 'success' or 'muted',
     options = options
@@ -194,8 +199,8 @@ end
 -- mz_admin:client:menuAction (action=onlinePlayers); nao e entrada da rail.
 local function openOnlinePlayers()
   local selected = MZAdminPlayerSelector.Select({
-    title = 'Selecionar jogador',
-    subtitle = 'Online primeiro; offline somente por pesquisa.',
+    title = translate('menu.s_639e7140ae08', 'Selecionar jogador'),
+    subtitle = translate('menu.s_8c36589930b9', 'Online primeiro; offline somente por pesquisa.'),
     allowOffline = true
   })
   if not selected then return false end
@@ -207,7 +212,7 @@ AddEventHandler(MENU_ACTION_EVENT, function(payload)
 
   if selected == 'tpHelp' then
     MZAdminUI.Notify(
-      ('Use /%s x y z [heading] para informar as coordenadas.'):format(Config.Commands.tp or 'tp'),
+      (translate('router.s_8d1a3f92444c', 'Use /%s x y z [heading] para informar as coordenadas.')):format(Config.Commands.tp or 'tp'),
       'inform'
     )
   elseif selected == 'tpm' then
@@ -275,26 +280,26 @@ end)
 local function registerVehicleMenu(actions, parentId)
   local options = {}
   option(options, actions.spawnVehicle, withAction({
-    title = 'Criar veiculo temporario',
-    description = 'Cria uma entidade de teste; nao cadastra garagem ou propriedade.',
+    title = translate('menu.s_e108a4bf1ca5', 'Criar veiculo temporario'),
+    description = translate('menu.s_81845015ebb6', 'Cria uma entidade de teste; nao cadastra garagem ou propriedade.'),
     icon = 'car'
   }, 'spawnVehicle'))
   option(options, actions.fixVehicle, withAction({
-    title = 'Reparar veiculo',
-    description = 'Repara o veiculo atual ou o mais proximo.',
+    title = translate('menu.s_cef01e0cef32', 'Reparar veiculo'),
+    description = translate('menu.s_bf28f825fd41', 'Repara o veiculo atual ou o mais proximo.'),
     icon = 'screwdriver-wrench'
   }, 'fixVehicle'))
   option(options, actions.deleteVehicle, withAction({
-    title = 'Remover veiculo proximo',
-    description = 'Remove a entidade atual ou mais proxima.',
+    title = translate('menu.s_d7c8f690231d', 'Remover veiculo proximo'),
+    description = translate('menu.s_a0fc894adfff', 'Remove a entidade atual ou mais proxima.'),
     icon = 'trash'
   }, 'deleteVehicle'))
 
   MZAdminUI.RegisterContext({
     id = VEHICLE_ID,
     menu = parentId,
-    title = 'Veículos administrativos',
-    subtitle = 'Acoes temporarias sobre entidades',
+    title = translate('menu.s_52dc6ad1425b', 'Veículos administrativos'),
+    subtitle = translate('menu.s_28348627ffee', 'Acoes temporarias sobre entidades'),
     options = options
   })
 end
@@ -370,15 +375,15 @@ function MZAdminMenu.RegisterModules(context)
 
   local vehicleOptions = {}
   option(vehicleOptions, hasVehicleActions, {
-    title = 'Veículos administrativos',
-    description = 'Acoes temporarias sobre entidades.',
+    title = translate('menu.s_52dc6ad1425b', 'Veículos administrativos'),
+    description = translate('menu.s_df4e58d8d709', 'Acoes temporarias sobre entidades.'),
     icon = 'car-side',
     menu = VEHICLE_ID,
     arrow = true
   })
   option(vehicleOptions, context.garageModuleAvailable, {
-    title = 'Garagens persistentes',
-    description = 'Criacao, edicao e ciclo de vida de garagens.',
+    title = translate('menu.s_10b6ecd9dc64', 'Garagens persistentes'),
+    description = translate('menu.s_1aeb2f984d57', 'Criacao, edicao e ciclo de vida de garagens.'),
     icon = 'warehouse',
     menu = MZAdminGarageWizard.GetMenuId(),
     arrow = true
@@ -389,13 +394,13 @@ function MZAdminMenu.RegisterModules(context)
   end
   local managementOptions = {}
   option(managementOptions, context.organizationAccess, withAction({
-    title = 'Administrar organizacoes',
-    description = 'Abre o Staff Menu do mz_org, que revalida sua propria sessao.',
+    title = translate('menu.s_160f4398dba7', 'Administrar organizacoes'),
+    description = translate('menu.s_b5d9afce0936', 'Abre o Staff Menu do mz_org, que revalida sua propria sessao.'),
     icon = 'building-shield'
   }, 'staffOrganizations'))
   option(managementOptions, context.staffManagementAvailable, {
-    title = 'Gerenciar equipe Staff',
-    description = 'Cargos globais, hierarquia, permissoes e atribuicoes.',
+    title = translate('menu.s_aa6396100f55', 'Gerenciar equipe Staff'),
+    description = translate('menu.s_3b1c41688571', 'Cargos globais, hierarquia, permissoes e atribuicoes.'),
     icon = 'user-shield',
     menu = MZAdminStaffManagement.GetMenuId(),
     arrow = true
@@ -403,25 +408,25 @@ function MZAdminMenu.RegisterModules(context)
 
   local moderationOptions = {}
   option(moderationOptions, context.banModuleAvailable, withAction({
-    title = 'Banimentos',
-    description = 'Consulta e revogacao pelo contrato oficial do MZ BanGuard.',
+    title = translate('menu.s_b0f7c118af48', 'Banimentos'),
+    description = translate('menu.s_2776a8d55212', 'Consulta e revogacao pelo contrato oficial do MZ BanGuard.'),
     icon = 'shield-virus'
   }, 'bans'))
   option(moderationOptions, CurrentBanGuardReady and actions.banRevoke, withAction({
-    title = 'Desbanir por Public ID',
-    description = 'Informe o codigo MBG e o motivo da revogacao.',
+    title = translate('menu.s_d8b1e70d16fb', 'Desbanir por Public ID'),
+    description = translate('menu.s_c9f51c3277eb', 'Informe o codigo MBG e o motivo da revogacao.'),
     icon = 'user-check'
   }, 'unbanByPublicId'))
   option(moderationOptions, whitelistClientAvailable, {
     title = 'Whitelist',
-    description = 'Solicitacoes de entrada, aprovacoes, recusas e revogacoes.',
+    description = translate('menu.s_66dad1d2209f', 'Solicitacoes de entrada, aprovacoes, recusas e revogacoes.'),
     icon = 'user-shield',
     menu = MZAdminWhitelist.GetMenuId(),
     arrow = true
   })
   option(moderationOptions, warningsClientAvailable and context.warningsModuleAvailable == true, {
-    title = 'Advertencias',
-    description = 'Consulta, aplicacao e revogacao conforme permissoes separadas.',
+    title = translate('menu.s_598c7e028360', 'Advertencias'),
+    description = translate('menu.s_202c12b5fc82', 'Consulta, aplicacao e revogacao conforme permissoes separadas.'),
     icon = 'triangle-exclamation',
     menu = MZAdminWarnings.GetMenuId(),
     arrow = true
@@ -429,65 +434,65 @@ function MZAdminMenu.RegisterModules(context)
 
   local auditOptions = {}
   option(auditOptions, actions.logsView, withAction({
-    title = 'Logs administrativos',
-    description = 'Eventos globais da Staff com filtros e paginacao.',
+    title = translate('menu.s_490f79b27c84', 'Logs administrativos'),
+    description = translate('menu.s_ecf3cea4a3c9', 'Eventos globais da Staff com filtros e paginacao.'),
     icon = 'clipboard-list'
   }, 'adminLogs'))
 
   local rootOptions = {}
   option(rootOptions, worldClientAvailable, {
-    title = 'Mundo e cenários',
+    title = translate('menu.s_f05831df0c1a', 'Mundo e cenários'),
     description = context.worldDoorsRuntime == true
-      and 'Portas, props e ferramentas de edicao visual.'
-      or 'Configuracao V2 disponivel; runtime ainda em modo seguro.',
+      and translate('menu.s_27440d799e7c', 'Portas, props e ferramentas de edicao visual.')
+      or translate('menu.s_1f39959c9680', 'Configuracao V2 disponivel; runtime ainda em modo seguro.'),
     icon = 'earth-americas',
     menu = WORLD_ID,
     arrow = true
   })
   option(rootOptions, registerSection(
     VEHICLE_SECTION_ID,
-    'Veículos e garagens',
-    'Entidades temporarias e estruturas persistentes',
+    translate('menu.s_542ccfdeb8f5', 'Veículos e garagens'),
+    translate('menu.s_fe3b9e834c2e', 'Entidades temporarias e estruturas persistentes'),
     vehicleOptions
   ), {
-    title = 'Veículos e garagens',
-    description = 'Ferramentas de veiculo e gerenciamento de garagens.',
+    title = translate('menu.s_542ccfdeb8f5', 'Veículos e garagens'),
+    description = translate('menu.s_4a1172da220b', 'Ferramentas de veiculo e gerenciamento de garagens.'),
     icon = 'warehouse',
     menu = VEHICLE_SECTION_ID,
     arrow = true
   })
   option(rootOptions, registerSection(
     MANAGEMENT_ID,
-    'Organizações e equipe',
-    'Estrutura organizacional e hierarquia Staff',
+    translate('menu.s_e642f77a4a2e', 'Organizações e equipe'),
+    translate('menu.s_fc83ed751315', 'Estrutura organizacional e hierarquia Staff'),
     managementOptions
   ), {
-    title = 'Organizações e equipe',
-    description = 'Organizacoes, cargos, permissoes e atribuicoes Staff.',
+    title = translate('menu.s_e642f77a4a2e', 'Organizações e equipe'),
+    description = translate('menu.s_a06cca26ef1d', 'Organizacoes, cargos, permissoes e atribuicoes Staff.'),
     icon = 'building-shield',
     menu = MANAGEMENT_ID,
     arrow = true
   })
   option(rootOptions, registerSection(
     MODERATION_ID,
-    'Moderação e acesso',
-    'Banimentos, whitelist e advertencias',
+    translate('menu.s_34670225bfb1', 'Moderação e acesso'),
+    translate('menu.s_01f750040f9d', 'Banimentos, whitelist e advertencias'),
     moderationOptions
   ), {
-    title = 'Moderação e acesso',
-    description = 'Punicoes administrativas e controle de entrada.',
+    title = translate('menu.s_34670225bfb1', 'Moderação e acesso'),
+    description = translate('menu.s_123876fb3561', 'Punicoes administrativas e controle de entrada.'),
     icon = 'shield-halved',
     menu = MODERATION_ID,
     arrow = true
   })
   option(rootOptions, registerSection(
     AUDIT_ID,
-    'Auditoria',
-    'Consulta de eventos administrativos globais',
+    translate('menu.s_111902784b57', 'Auditoria'),
+    translate('menu.s_bd52e04be90e', 'Consulta de eventos administrativos globais'),
     auditOptions
   ), {
-    title = 'Auditoria',
-    description = 'Logs globais, filtros e rastreabilidade.',
+    title = translate('menu.s_111902784b57', 'Auditoria'),
+    description = translate('menu.s_b2eb27160af2', 'Logs globais, filtros e rastreabilidade.'),
     icon = 'clipboard-list',
     menu = AUDIT_ID,
     arrow = true
@@ -499,8 +504,8 @@ function MZAdminMenu.RegisterModules(context)
 
   if #rootOptions == 0 then
     rootOptions[1] = {
-      title = 'Nenhuma area autorizada',
-      description = 'O acesso ao painel nao concede permissoes operacionais.',
+      title = translate('menu.s_0e9154cb44f3', 'Nenhuma area autorizada'),
+      description = translate('menu.s_706b2e2b88b6', 'O acesso ao painel nao concede permissoes operacionais.'),
       icon = 'lock',
       readOnly = true
     }
@@ -522,13 +527,13 @@ function MZAdminMenu.RegisterModules(context)
   -- e a rail de dominios montada por GetNavigationTabs.
   MZAdminUI.RegisterContext({
     id = ROOT_ID,
-    title = 'Administração',
-    subtitle = 'Central operacional da MZ Framework',
+    title = translate('menu.s_855dc3dcbe0a', 'Administração'),
+    subtitle = translate('menu.s_dbb2ac47e4c6', 'Central operacional da MZ Framework'),
     brand = 'MZ Admin',
     headerIcon = 'shield-halved',
     badge = 'STAFF',
     searchable = true,
-    searchPlaceholder = 'Buscar ferramenta, modulo ou acao...',
+    searchPlaceholder = translate('menu.s_b4443c2bcc9d', 'Buscar ferramenta, modulo ou acao...'),
     theme = {
       accent = '#009FE3',
       accent2 = '#67C9F1',

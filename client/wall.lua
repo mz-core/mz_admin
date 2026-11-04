@@ -54,7 +54,7 @@ local function drawText(x, y, text, scale, rgba)
 end
 
 local function notify(enabled)
-  local message = enabled and 'Wall ativado.' or 'Wall desativado.'
+  local message = enabled and (type(locale) == 'function' and locale('wall.s_c50b252ae65b') or 'Wall ativado.') or (type(locale) == 'function' and locale('wall.s_4f913b1c053c') or 'Wall desativado.')
   if type(MZAdminUI) == 'table' then
     MZAdminUI.Notify(message, enabled and 'success' or 'info')
   elseif lib and lib.notify then
@@ -121,7 +121,7 @@ local function toggleWall()
 end
 
 RegisterCommand(Config.WallCommand or 'wall', toggleWall, false)
-RegisterKeyMapping(Config.WallCommand or 'wall', 'Ativar/desativar wall administrativo', 'keyboard', '')
+RegisterKeyMapping(Config.WallCommand or 'wall', (type(locale) == 'function' and locale('wall.s_cd3a2198cc60') or 'Ativar/desativar wall administrativo'), 'keyboard', '')
 
 local function cleanupWall()
   if MZAdminWallClient.active ~= true then return end
@@ -155,6 +155,14 @@ CreateThread(function()
 end)
 
 CreateThread(function()
+  local outsideStream = (type(locale) == 'function' and locale('wall.s_d6ebaa5955fa') or 'FORA STREAM')
+  local noInfo = (type(locale) == 'function' and locale('wall.s_9c71b5c09cdb') or 'SEM INFO')
+  local vehicle = (type(locale) == 'function' and locale('wall.s_617c82caca92') or 'VEICULO')
+  local vehiclePrefix = (type(locale) == 'function' and locale('wall.s_e072247ecc13') or 'VEI:')
+  local onFoot = (type(locale) == 'function' and locale('wall.s_679ca1c1a941') or 'A PE')
+  local armed = (type(locale) == 'function' and locale('wall.s_c2384bd95c99') or 'ARMADO')
+  local unarmed = (type(locale) == 'function' and locale('wall.s_52ab57782c42') or 'DESARMADO')
+  local unavailable = (type(locale) == 'function' and locale('router.s_735388ef2f3c') or 'indisponivel')
   while true do
     if MZAdminWallClient.active ~= true then
       Wait(250)
@@ -192,7 +200,7 @@ CreateThread(function()
             local dx, dy, dz = ownCoords.x - x, ownCoords.y - y, ownCoords.z - z
             local distance = math.sqrt(dx * dx + dy * dy + dz * dz)
             if distance <= (tonumber(setting('drawDistance', 800.0)) or 800.0) then
-              local healthText, armorText, movementText, weaponText = '??', '??', 'FORA STREAM', 'SEM INFO'
+              local healthText, armorText, movementText, weaponText = '??', '??', outsideStream, noInfo
               local isDead = false
 
               if ped ~= 0 then
@@ -203,17 +211,17 @@ CreateThread(function()
                 isDead = IsEntityDead(ped)
 
                 if IsPedInAnyVehicle(ped, false) then
-                  movementText = 'VEICULO'
+                  movementText = vehicle
                   if setting('showVehicleName', true) == true then
                     local label = vehicleLabel(GetVehiclePedIsIn(ped, false))
-                    if label then movementText = 'VEI:' .. label end
+                    if label then movementText = vehiclePrefix .. label end
                   end
                 else
-                  movementText = 'A PE'
+                  movementText = onFoot
                 end
 
                 if setting('showWeaponState', true) == true then
-                  weaponText = IsPedArmed(ped, 7) and 'ARMADO' or 'DESARMADO'
+                  weaponText = IsPedArmed(ped, 7) and armed or unarmed
                 end
               end
 
@@ -224,7 +232,7 @@ CreateThread(function()
               local staffText = row.staffTag and (' [%s]'):format(cleanText(row.staffTag, 12)) or ''
               local bucketText = otherBucket and ('DIM:%s*'):format(row.bucket) or ('DIM:%s'):format(row.bucket)
               local citizenText = cleanText(
-                row.citizenid or 'indisponivel',
+                row.citizenid or unavailable,
                 setting('citizenIdMaxLength', 24)
               )
               local line1 = ('[%d] %s%s | CID:%s'):format(

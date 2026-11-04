@@ -147,7 +147,7 @@ lib.callback.register('mz_admin:server:tabletKick', function(source, targetId, r
   end
 
   audit(sourceId, resolved, 'kick', true, 'authorized')
-  DropPlayer(resolved, ('Voce foi removido pela Staff.\nMotivo: %s'):format(reason))
+  DropPlayer(resolved, ((type(locale) == 'function' and locale('server_messages.s_0e836f0e3915') or 'Voce foi removido pela Staff.\nMotivo: %s')):format(reason))
   return ok()
 end)
 

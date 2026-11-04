@@ -15,7 +15,7 @@ local function notify(message, kind)
     local ok, result = pcall(function()
       return exports['mz_notify']:Notify({
         type = notifyType,
-        title = 'Tomadas de carregamento',
+        title = (type(locale) == 'function' and locale('world.s_26ece3d0d2c1') or 'Tomadas de carregamento'),
         message = tostring(message or ''),
         duration = 4000
       })
@@ -23,7 +23,7 @@ local function notify(message, kind)
     if ok and result ~= false then return true end
   end
   if type(MZAdminUI) == 'table' then
-    return MZAdminUI.Notify(message, kind, 4000, { title = 'Tomadas de carregamento' })
+    return MZAdminUI.Notify(message, kind, 4000, { title = (type(locale) == 'function' and locale('world.s_26ece3d0d2c1') or 'Tomadas de carregamento') })
   end
   return false
 end
@@ -31,7 +31,7 @@ end
 local function request(name, ...)
   local result = lib.callback.await('mz_admin:server:' .. name, false, ...)
   if type(result) ~= 'table' or result.ok ~= true then
-    notify(('Operacao recusada: %s'):format(tostring(result and result.error or 'sem resposta')), 'error')
+    notify(((type(locale) == 'function' and locale('world.s_39f03078b08a') or 'Operacao recusada: %s')):format(tostring(result and result.error or (type(locale) == 'function' and locale('world.s_82a6418075b3') or 'sem resposta'))), 'error')
     return nil
   end
   return result.data or {}
@@ -71,7 +71,7 @@ end
 
 local function startPlacement(pending, initial)
   if GetResourceState('mz_world_editor') ~= 'started' then
-    notify('mz_world_editor nao esta iniciado.', 'error')
+    notify((type(locale) == 'function' and locale('world.s_c7e1821b9acb') or 'mz_world_editor nao esta iniciado.'), 'error')
     if pending.sessionId then
       lib.callback.await('mz_admin:server:cancelWorldChargingOutletDraft', false, pending.sessionId)
     end
@@ -81,7 +81,7 @@ local function startPlacement(pending, initial)
   MZAdminUI.CloseContext()
   local ok, err = exports['mz_world_editor']:StartPropPlacement({
     requestId = pending.requestId,
-    title = pending.mode == 'create' and 'Posicionar tomada customizada' or 'Reposicionar tomada customizada',
+    title = pending.mode == 'create' and (type(locale) == 'function' and locale('world_outlets.s_c20e3dadcda6') or 'Posicionar tomada customizada') or (type(locale) == 'function' and locale('world_outlets.s_e862cfeb159e') or 'Reposicionar tomada customizada'),
     modelHash = GetHashKey(pending.chargerModel),
     modelName = pending.chargerModel,
     initialCoords = initial and initial.coords or nil,
@@ -93,7 +93,7 @@ local function startPlacement(pending, initial)
   })
   if ok ~= true then
     closePending(true)
-    notify(('Nao foi possivel iniciar o placement: %s'):format(tostring(err)), 'error')
+    notify(((type(locale) == 'function' and locale('world_props.s_d26ece520ac4') or 'Nao foi possivel iniciar o placement: %s')):format(tostring(err)), 'error')
     MZAdminUI.ShowContext(MENU_ID)
     return false
   end
@@ -101,11 +101,11 @@ local function startPlacement(pending, initial)
 end
 
 local function startCreate()
-  local values = MZAdminUI.InputDialog('Nova tomada customizada', {
-    { type = 'input', label = 'Nome', required = true, placeholder = 'Tomada - Recepcao' },
-    { type = 'input', label = 'Codigo estrutural', required = false, placeholder = 'recepcao_01' },
+  local values = MZAdminUI.InputDialog((type(locale) == 'function' and locale('world_outlets.s_54fca668ec1b') or 'Nova tomada customizada'), {
+    { type = 'input', label = (type(locale) == 'function' and locale('router.s_13030dd962f4') or 'Nome'), required = true, placeholder = (type(locale) == 'function' and locale('world_outlets.s_4bc48a3fc1a8') or 'Tomada - Recepcao') },
+    { type = 'input', label = (type(locale) == 'function' and locale('garage.s_ba53a1f3589a') or 'Codigo estrutural'), required = false, placeholder = 'recepcao_01' },
     {
-      type = 'number', label = 'Distancia de interacao', required = true,
+      type = 'number', label = (type(locale) == 'function' and locale('world.s_5f5f25b01c07') or 'Distancia de interacao'), required = true,
       default = 1.8, min = 0.5, max = 4.0
     }
   }, { allowCancel = true })
@@ -131,7 +131,7 @@ local function showDetails(outletId)
   local position = vector(outlet.position)
   local options = {
     {
-      title = outlet.enabled == false and 'Arquivada' or 'Ativa',
+      title = outlet.enabled == false and (type(locale) == 'function' and locale('garage.s_692ec2b46d82') or 'Arquivada') or (type(locale) == 'function' and locale('garage.s_f21c4ff2bbb3') or 'Ativa'),
       description = ('%s | %.3f, %.3f, %.3f'):format(tostring(outlet.code), position.x, position.y, position.z),
       icon = outlet.enabled == false and 'box-archive' or 'plug',
       readOnly = true
@@ -139,20 +139,20 @@ local function showDetails(outletId)
   }
   if CurrentActions.worldPropManage == true then
     options[#options + 1] = bind({
-      title = 'Editar nome e distancia',
-      description = ('Interacao atual: %.2fm'):format(tonumber(outlet.interactionDistance) or 1.8),
+      title = (type(locale) == 'function' and locale('world_outlets.s_f41efd5b4a81') or 'Editar nome e distancia'),
+      description = ((type(locale) == 'function' and locale('world_outlets.s_62159c88f694') or 'Interacao atual: %.2fm')):format(tonumber(outlet.interactionDistance) or 1.8),
       icon = 'sliders'
     }, 'edit', { outletId = tostring(outlet.id) })
     options[#options + 1] = bind({
-      title = 'Reposicionar no mundo',
-      description = 'Abre o placement com snap em superficie e rotacao XYZ.',
+      title = (type(locale) == 'function' and locale('world_outlets.s_08aee04d1d7c') or 'Reposicionar no mundo'),
+      description = (type(locale) == 'function' and locale('world_outlets.s_1c4c8b0b2c97') or 'Abre o placement com snap em superficie e rotacao XYZ.'),
       icon = 'location-crosshairs'
     }, 'move', { outletId = tostring(outlet.id) })
   end
   if CurrentActions.worldPropArchive == true then
     options[#options + 1] = bind({
-      title = outlet.enabled == false and 'Restaurar tomada' or 'Arquivar tomada',
-      description = 'O registro e o historico permanecem no banco.',
+      title = outlet.enabled == false and (type(locale) == 'function' and locale('world_outlets.s_13ab9a24e81a') or 'Restaurar tomada') or (type(locale) == 'function' and locale('world_outlets.s_c13721d05d6c') or 'Arquivar tomada'),
+      description = (type(locale) == 'function' and locale('world_outlets.s_7a6d982bd9b3') or 'O registro e o historico permanecem no banco.'),
       icon = outlet.enabled == false and 'rotate-left' or 'box-archive'
     }, 'setEnabled', { outletId = tostring(outlet.id), enabled = outlet.enabled == false })
   end
@@ -177,7 +177,7 @@ local function openList()
     local option = {
       title = tostring(outlet.label),
       description = ('%s | %s | %.2fm | %.1f %.1f %.1f'):format(
-        tostring(outlet.code), outlet.enabled == false and 'arquivada' or 'ativa',
+        tostring(outlet.code), outlet.enabled == false and (type(locale) == 'function' and locale('garage.s_e46e99168ad6') or 'arquivada') or (type(locale) == 'function' and locale('garage.s_1b9e540e4a17') or 'ativa'),
         tonumber(outlet.interactionDistance) or 1.8, position.x, position.y, position.z
       ),
       icon = outlet.enabled == false and 'box-archive' or 'plug',
@@ -187,13 +187,13 @@ local function openList()
     options[#options + 1] = option
   end
   if #options == 0 then
-    options[1] = { title = 'Nenhuma tomada customizada', icon = 'plug', readOnly = true }
+    options[1] = { title = (type(locale) == 'function' and locale('world_outlets.s_f54e1cc23578') or 'Nenhuma tomada customizada'), icon = 'plug', readOnly = true }
   end
   MZAdminUI.RegisterContext({
     id = LIST_ID,
     menu = MENU_ID,
-    title = 'Tomadas customizadas',
-    subtitle = ('%d cadastrada(s)'):format(#(data.outlets or {})),
+    title = (type(locale) == 'function' and locale('world_outlets.s_8e4bb05fb9a5') or 'Tomadas customizadas'),
+    subtitle = ((type(locale) == 'function' and locale('garage.s_4abb390912f0') or '%d cadastrada(s)')):format(#(data.outlets or {})),
     options = options
   })
   MZAdminUI.ShowContext(LIST_ID)
@@ -205,24 +205,24 @@ function MZAdminChargingOutlets.Register(parentId, actions, ready)
   local options = {}
   if CurrentActions.worldPropCreate == true then
     options[#options + 1] = bind({
-      title = 'Criar tomada customizada',
-      description = 'Ancora invisivel para paredes e tomadas incorporadas ao MLO.',
+      title = (type(locale) == 'function' and locale('world_outlets.s_cbb60c82ba0e') or 'Criar tomada customizada'),
+      description = (type(locale) == 'function' and locale('world_outlets.s_ea38f70e622c') or 'Ancora invisivel para paredes e tomadas incorporadas ao MLO.'),
       icon = 'plug-circle-plus'
     }, 'create')
   end
   if CurrentActions.worldView == true or CurrentActions.worldPropManage == true
     or CurrentActions.worldPropArchive == true then
     options[#options + 1] = bind({
-      title = 'Tomadas cadastradas',
-      description = 'Consultar, reposicionar, arquivar e restaurar.',
+      title = (type(locale) == 'function' and locale('world_outlets.s_de3b81b59e19') or 'Tomadas cadastradas'),
+      description = (type(locale) == 'function' and locale('world_outlets.s_8e91a90fb220') or 'Consultar, reposicionar, arquivar e restaurar.'),
       icon = 'list'
     }, 'list')
   end
   MZAdminUI.RegisterContext({
     id = MENU_ID,
     menu = parentId,
-    title = 'Tomadas de carregamento',
-    subtitle = 'Fallback persistente para interiores e MLOs',
+    title = (type(locale) == 'function' and locale('world.s_26ece3d0d2c1') or 'Tomadas de carregamento'),
+    subtitle = (type(locale) == 'function' and locale('world_outlets.s_204a93e2f3c6') or 'Fallback persistente para interiores e MLOs'),
     options = options
   })
   return true
@@ -243,10 +243,10 @@ AddEventHandler(ACTION_EVENT, function(payload)
   elseif action == 'edit' then
     local outlet = Listed[tostring(payload.outletId)]
     if not outlet then return end
-    local values = MZAdminUI.InputDialog('Editar tomada customizada', {
-      { type = 'input', label = 'Nome', required = true, default = tostring(outlet.label or '') },
+    local values = MZAdminUI.InputDialog((type(locale) == 'function' and locale('world_outlets.s_16aedf6e57c4') or 'Editar tomada customizada'), {
+      { type = 'input', label = (type(locale) == 'function' and locale('router.s_13030dd962f4') or 'Nome'), required = true, default = tostring(outlet.label or '') },
       {
-        type = 'number', label = 'Distancia de interacao', required = true,
+        type = 'number', label = (type(locale) == 'function' and locale('world.s_5f5f25b01c07') or 'Distancia de interacao'), required = true,
         default = tonumber(outlet.interactionDistance) or 1.8, min = 0.5, max = 4.0
       }
     }, { allowCancel = true })
@@ -257,7 +257,7 @@ AddEventHandler(ACTION_EVENT, function(payload)
     })
     if data and data.outlet then
       Listed[tostring(data.outlet.id)] = data.outlet
-      notify('Tomada atualizada.', 'success')
+      notify((type(locale) == 'function' and locale('world_outlets.s_39e9cd38c8a6') or 'Tomada atualizada.'), 'success')
       showDetails(data.outlet.id)
     end
   elseif action == 'move' then
@@ -279,12 +279,12 @@ AddEventHandler(ACTION_EVENT, function(payload)
       surfaceNormal = outlet.surfaceNormal
     })
   elseif action == 'setEnabled' then
-    local verb = payload.enabled == true and 'restaurar' or 'arquivar'
-    if MZAdminUI.Confirm(('Deseja %s esta tomada?'):format(verb), 'O registro permanecera no banco.') then
+    local verb = payload.enabled == true and (type(locale) == 'function' and locale('world.s_27985c84c2e0') or 'restaurar') or (type(locale) == 'function' and locale('world.s_6675573e1a64') or 'arquivar')
+    if MZAdminUI.Confirm(((type(locale) == 'function' and locale('world_outlets.s_16ae481bba80') or 'Deseja %s esta tomada?')):format(verb), (type(locale) == 'function' and locale('world_props.s_5616a66b7665') or 'O registro permanecera no banco.')) then
       local data = request('setWorldChargingOutletEnabled', payload.outletId, payload.enabled == true)
       if data and data.outlet then
         Listed[tostring(data.outlet.id)] = data.outlet
-        notify(data.outlet.enabled == true and 'Tomada restaurada.' or 'Tomada arquivada.', 'success')
+        notify(data.outlet.enabled == true and (type(locale) == 'function' and locale('world_outlets.s_15324f5ae56b') or 'Tomada restaurada.') or (type(locale) == 'function' and locale('world_outlets.s_674d4ce91fe0') or 'Tomada arquivada.'), 'success')
         showDetails(data.outlet.id)
       end
     end
@@ -294,13 +294,13 @@ end)
 AddEventHandler('mz_world_editor:client:placementResult', function(requestId, placement)
   local pending = Pending
   if not pending or tostring(requestId) ~= tostring(pending.requestId) then return end
-  local summary = ('Nome: %s\nCoords: %.3f %.3f %.3f\nRotacao: %.2f %.2f %.2f'):format(
+  local summary = ((type(locale) == 'function' and locale('world_outlets.s_f06ca5fed61f') or 'Nome: %s\nCoords: %.3f %.3f %.3f\nRotacao: %.2f %.2f %.2f')):format(
     tostring(pending.label),
     tonumber(placement.coords.x) or 0, tonumber(placement.coords.y) or 0, tonumber(placement.coords.z) or 0,
     tonumber(placement.rotation.x) or 0, tonumber(placement.rotation.y) or 0, tonumber(placement.rotation.z) or 0
   )
-  if not MZAdminUI.Confirm('Salvar tomada customizada?', summary, {
-    labels = { confirm = 'Salvar', cancel = 'Descartar' }
+  if not MZAdminUI.Confirm((type(locale) == 'function' and locale('world_outlets.s_48fd3657088d') or 'Salvar tomada customizada?'), summary, {
+    labels = { confirm = (type(locale) == 'function' and locale('garage.s_93bf2d32ec33') or 'Salvar'), cancel = (type(locale) == 'function' and locale('world_props.s_63a77c77e07e') or 'Descartar') }
   }) then
     closePending(true)
     MZAdminUI.ShowContext(MENU_ID)
@@ -323,7 +323,7 @@ AddEventHandler('mz_world_editor:client:placementResult', function(requestId, pl
   closePending(data == nil and pending.mode == 'create')
   if data and data.outlet then
     Listed[tostring(data.outlet.id)] = data.outlet
-    notify(pending.mode == 'create' and 'Tomada criada.' or 'Tomada reposicionada.', 'success')
+    notify(pending.mode == 'create' and (type(locale) == 'function' and locale('world_outlets.s_6e9e6f227b89') or 'Tomada criada.') or (type(locale) == 'function' and locale('world_outlets.s_3ff591504d80') or 'Tomada reposicionada.'), 'success')
   end
   MZAdminUI.ShowContext(MENU_ID)
 end)
@@ -331,7 +331,7 @@ end)
 AddEventHandler('mz_world_editor:client:placementCancelled', function(requestId)
   if not Pending or tostring(requestId) ~= tostring(Pending.requestId) then return end
   closePending(true)
-  notify('Placement cancelado.', 'info')
+  notify((type(locale) == 'function' and locale('world_props.s_8ff23d40d6fa') or 'Placement cancelado.'), 'info')
   MZAdminUI.ShowContext(MENU_ID)
 end)
 
@@ -346,5 +346,5 @@ AddEventHandler('onClientResourceStop', function(resource)
   end
   if resource ~= 'mz_world_editor' or not Pending then return end
   closePending(true)
-  notify('Placement cancelado porque o editor foi encerrado.', 'warn')
+  notify((type(locale) == 'function' and locale('world_outlets.s_9e051468756d') or 'Placement cancelado porque o editor foi encerrado.'), 'warn')
 end)

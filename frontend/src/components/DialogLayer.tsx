@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/locale"
 import { useEffect, useRef } from "react"
 import { Icon } from "@/components/Icon"
 import { Button } from "@/components/ui/button"
@@ -34,9 +35,9 @@ function getAlertVariant(data: AlertDialogData): Variant {
   return "info"
 }
 
-function renderInputRow(row: InputRow, index: number, first: boolean) {
+function renderInputRow(row: InputRow, index: number, first: boolean, fieldLabel: string) {
   const type = row.type || "input"
-  const label = row.label || row.name || `Campo ${index + 1}`
+  const label = row.label || row.name || fieldLabel.replace("{number}", String(index + 1))
   const name = `field_${index}`
   const placeholder = row.placeholder || ""
   const value = row.default ?? row.value ?? ""
@@ -121,6 +122,7 @@ function renderInputRow(row: InputRow, index: number, first: boolean) {
 }
 
 export function DialogLayer({ dialog, onCancel, onInputSubmit, onAlertConfirm }: DialogLayerProps) {
+  const t = useTranslation()
   const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -142,15 +144,15 @@ export function DialogLayer({ dialog, onCancel, onInputSubmit, onAlertConfirm }:
     const rows = Array.isArray(payload.rows) ? payload.rows : []
     const options = payload.options || {}
     const labels = options.labels || {}
-    const confirmLabel = labels.confirm || options.confirmLabel || "Confirmar"
-    const cancelLabel = labels.cancel || options.cancelLabel || "Cancelar"
+    const confirmLabel = labels.confirm || options.confirmLabel || t("confirm")
+    const cancelLabel = labels.cancel || options.cancelLabel || t("cancel")
 
     return (
       <section id="dialogOverlay" className="mz-dialogOverlay">
         <div id="dialog" className="mz-dialog" role="dialog" aria-modal="true" ref={dialogRef}>
           <div className="dialog__header">
-            <h2 className="dialog__title">{payload.title || "Input"}</h2>
-            <button className="mz-icon-btn" type="button" title="Fechar" aria-label="Fechar" onClick={onCancel}>
+            <h2 className="dialog__title">{payload.title || t("input_title")}</h2>
+            <button className="mz-icon-btn" type="button" title={t("close")} aria-label={t("close")} onClick={onCancel}>
               <Icon name="x" />
             </button>
           </div>
@@ -174,7 +176,7 @@ export function DialogLayer({ dialog, onCancel, onInputSubmit, onAlertConfirm }:
             }}
           >
             <div className="dialog__body">
-              {rows.map((row, index) => renderInputRow(row, index, index === 0))}
+              {rows.map((row, index) => renderInputRow(row, index, index === 0, t("field_label")))}
             </div>
             <div className="dialog__actions">
               <Button className="btn" type="button" variant="ghost" onClick={onCancel}>{cancelLabel}</Button>
@@ -192,8 +194,8 @@ export function DialogLayer({ dialog, onCancel, onInputSubmit, onAlertConfirm }:
   const confirmClass = variant === "danger" ? "btn btn--danger" : "btn btn--primary"
   const iconName = variant === "danger" || variant === "warning" ? "warning" : "info"
   const labels = data.labels || {}
-  const confirmLabel = labels.confirm || data.confirmLabel || data.confirm || data.confirmText || "Confirmar"
-  const cancelLabel = labels.cancel || data.cancelLabel || data.cancelText || "Cancelar"
+  const confirmLabel = labels.confirm || data.confirmLabel || data.confirm || data.confirmText || t("confirm")
+  const cancelLabel = labels.cancel || data.cancelLabel || data.cancelText || t("cancel")
 
   return (
     <section id="dialogOverlay" className="mz-dialogOverlay">
@@ -201,7 +203,7 @@ export function DialogLayer({ dialog, onCancel, onInputSubmit, onAlertConfirm }:
         <div className="dialog__body dialog__confirmContent">
           <span className={`dialog__warnIcon is-${variant}`}><Icon name={iconName} /></span>
           <div>
-            <h2 className="dialog__title">{data.header || data.title || "Alerta"}</h2>
+            <h2 className="dialog__title">{data.header || data.title || t("alert")}</h2>
             <p className="dialog__message">{data.content || data.description || ""}</p>
           </div>
         </div>

@@ -127,14 +127,14 @@ function MZNoClip.toggle()
 
   local entity = getNoClipEntity()
   if entity == 0 or not DoesEntityExist(entity) then
-    notify('Entidade inválida para noclip.', 'error')
+    notify((type(locale) == 'function' and locale('noclip.s_86d044d62403') or 'Entidade inválida para noclip.'), 'error')
     return
   end
 
   MZNoClip.entity = entity
   MZNoClip.active = true
   setEntityNoClipState(entity, true)
-  notify('Noclip administrativo ativado.', 'success')
+  notify((type(locale) == 'function' and locale('noclip.s_262b189eeffa') or 'Noclip administrativo ativado.'), 'success')
 end
 
 function MZNoClip.stop()
@@ -146,7 +146,7 @@ function MZNoClip.stop()
 
   restoreEntity(entity)
   restoreEntity(PlayerPedId())
-  notify('Noclip administrativo desativado.', 'inform')
+  notify((type(locale) == 'function' and locale('noclip.s_7839e22f51f2') or 'Noclip administrativo desativado.'), 'inform')
 end
 
 CreateThread(function()
@@ -206,7 +206,7 @@ CreateThread(function()
         SetEntityVelocity(entity, 0.0, 0.0, 0.0)
         SetEntityHeading(entity, camRot.z)
 
-        drawHelpText(('~g~NOCLIP TESTE~s~\nWASD mover | SPACE subir | CTRL/Q descer\nSHIFT rápido | Scroll velocidade: ~b~%sx~s~\n/%s desativa'):format(MZNoClip.speedIndex, Config.NoClipCommand or 'noclip'))
+        drawHelpText(((type(locale) == 'function' and locale('noclip.s_8633ef837e54') or '~g~NOCLIP TESTE~s~\nWASD mover | SPACE subir | CTRL/Q descer\nSHIFT rápido | Scroll velocidade: ~b~%sx~s~\n/%s desativa')):format(MZNoClip.speedIndex, Config.NoClipCommand or 'noclip'))
       end
     end
   end
@@ -222,14 +222,14 @@ local function toggleAuthorizedNoClip()
   if not lib or not lib.callback or type(lib.callback.await) ~= 'function' then return end
   local ok, response = pcall(lib.callback.await, 'mz_admin:server:toggleNoClip', false)
   if not ok or type(response) ~= 'table' or response.ok ~= true then
-    notify('Noclip negado pelo servidor.', 'error')
+    notify((type(locale) == 'function' and locale('noclip.s_c72618186084') or 'Noclip negado pelo servidor.'), 'error')
     return
   end
   if response.enabled == true then MZNoClip.toggle() else MZNoClip.stop() end
 end
 
 RegisterCommand(Config.NoClipCommand or 'noclip', toggleAuthorizedNoClip, false)
-RegisterKeyMapping(Config.NoClipCommand or 'noclip', 'Ativar/desativar noclip administrativo', 'keyboard', '')
+RegisterKeyMapping(Config.NoClipCommand or 'noclip', (type(locale) == 'function' and locale('noclip.s_170910a2b36b') or 'Ativar/desativar noclip administrativo'), 'keyboard', '')
 
 local function stopAuthorizedNoClip()
   if MZNoClip.active then MZNoClip.stop() end

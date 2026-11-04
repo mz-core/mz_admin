@@ -1,3 +1,8 @@
+local function translate(key, fallback)
+  local text = type(locale) == 'function' and locale(key) or nil
+  return type(text) == 'string' and text ~= '' and text ~= key and text or fallback
+end
+
 -- mz_admin/client/router.lua
 -- MZ Admin Unificado — unico roteador de navegacao administrativa.
 --
@@ -77,7 +82,12 @@ local ERROR_MESSAGES = {
 
 local function errorMessage(err)
   err = tostring(err or 'unknown_error')
-  return ERROR_MESSAGES[err] or ('Acao negada: ' .. err)
+  if ERROR_MESSAGES[err] and type(locale) == 'function' then
+    local key = 'errors.' .. err
+    local text = locale(key)
+    if type(text) == 'string' and text ~= '' and text ~= key then return text end
+  end
+  return ERROR_MESSAGES[err] or (translate('router.s_d9c4ffa0dedc', 'Acao negada: ') .. err)
 end
 
 local function awaitCallback(name, ...)
@@ -154,53 +164,53 @@ end
 local function mainView()
   local rows = {}
   if Actions.noclip then
-    rows[#rows + 1] = row('NoClip', 'Alterna modo livre autorizado pelo servidor.', 'person-flying',
+    rows[#rows + 1] = row('NoClip', translate('router.s_bf6828a57bc4', 'Alterna modo livre autorizado pelo servidor.'), 'person-flying',
       { primary = { action = 'noclip' } })
   end
   if Actions.tpm then
-    rows[#rows + 1] = row('Teleportar ao waypoint', 'Vai ate o ponto marcado no mapa.', 'map-location-dot',
+    rows[#rows + 1] = row(translate('router.s_86b143431d4f', 'Teleportar ao waypoint'), translate('router.s_17556bb603fe', 'Vai ate o ponto marcado no mapa.'), 'map-location-dot',
       { primary = { action = 'tpm' } })
   end
   if Actions.tp then
-    rows[#rows + 1] = row('Teleportar por coordenadas', ('Use /%s x y z [heading].'):format(Config.Commands.tp or 'tp'), 'location-dot',
+    rows[#rows + 1] = row(translate('router.s_b55ffb57ac71', 'Teleportar por coordenadas'), (translate('router.s_5839bf0b88e6', 'Use /%s x y z [heading].')):format(Config.Commands.tp or 'tp'), 'location-dot',
       { primary = { action = 'tpHelp' } })
   end
   if Actions.loc then
-    rows[#rows + 1] = row('Copiar coordenadas', 'Exibe coords de entidade e de solo.', 'crosshairs',
+    rows[#rows + 1] = row(translate('router.s_47e07710854c', 'Copiar coordenadas'), translate('router.s_9e5357b3169e', 'Exibe coords de entidade e de solo.'), 'crosshairs',
       { primary = { action = 'loc' } })
   end
   if Actions.heal then
-    rows[#rows + 1] = row('Curar a si mesmo', 'Restaura vida, fome e sede.', 'heart-pulse',
+    rows[#rows + 1] = row(translate('router.s_eeba67a999e3', 'Curar a si mesmo'), translate('router.s_a6c30a351d6a', 'Restaura vida, fome e sede.'), 'heart-pulse',
       { primary = { action = 'selfHeal' } })
   end
   if Actions.revive then
-    rows[#rows + 1] = row('Reviver a si mesmo', 'Conclui o ciclo canonico de respawn.', 'kit-medical',
+    rows[#rows + 1] = row(translate('router.s_85a512b2fdf8', 'Reviver a si mesmo'), translate('router.s_24434430a5ba', 'Conclui o ciclo canonico de respawn.'), 'kit-medical',
       { primary = { action = 'selfRevive' } })
   end
   if Actions.armor then
-    rows[#rows + 1] = row('Colete 100', 'Define o colete canonico em 100.', 'shield',
+    rows[#rows + 1] = row(translate('router.s_2365a947e4cd', 'Colete 100'), translate('router.s_be36cdd59a7f', 'Define o colete canonico em 100.'), 'shield',
       { primary = { action = 'selfArmor' } })
   end
   if Actions.godMode then
-    rows[#rows + 1] = row('Godmode', 'Alterna invencibilidade local autorizada.', 'shield-halved',
+    rows[#rows + 1] = row('Godmode', translate('router.s_b228ef9be552', 'Alterna invencibilidade local autorizada.'), 'shield-halved',
       { primary = { action = 'selfGodmode' } })
   end
   if Actions.wall then
-    rows[#rows + 1] = row('Wall', 'Exibe players em tempo real com estado autorizado.', 'eye',
+    rows[#rows + 1] = row('Wall', translate('router.s_f2596f452164', 'Exibe players em tempo real com estado autorizado.'), 'eye',
       { primary = { action = 'wall' } })
   end
   if Actions.spectate then
-    rows[#rows + 1] = row('Encerrar spectate', 'Retorna a posicao e dimensao originais.', 'eye-slash',
+    rows[#rows + 1] = row(translate('router.s_1d202c1009c7', 'Encerrar spectate'), translate('router.s_de328d585546', 'Retorna a posicao e dimensao originais.'), 'eye-slash',
       { primary = { action = 'spectateStop' } })
   end
 
   return {
     tab = TAB_MAIN,
     category = TAB_MAIN,
-    title = 'Principal',
-    subtitle = 'Acoes rapidas da sua sessao',
+    title = translate('menu.s_f3b86b13dbbc', 'Principal'),
+    subtitle = translate('menu.s_6eadd2754722', 'Acoes rapidas da sua sessao'),
     rows = rows,
-    empty = 'Nenhuma acao de sessao autorizada.'
+    empty = translate('router.s_7502f010eeb3', 'Nenhuma acao de sessao autorizada.')
   }
 end
 
@@ -241,11 +251,11 @@ end
 
 local function playerButtons()
   local buttons = {}
-  if Actions.gotoPlayer then buttons[#buttons + 1] = btn('goto', 'Ir até', 'arrow-right') end
-  if Actions.bringPlayer then buttons[#buttons + 1] = btn('bring', 'Trazer', 'users') end
-  if Actions.spectate then buttons[#buttons + 1] = btn('spectate', 'Esp.', 'eye') end
-  if Actions.heal then buttons[#buttons + 1] = btn('heal', 'Curar', 'heart-pulse') end
-  if Actions.revive then buttons[#buttons + 1] = btn('revive', 'Reviver', 'kit-medical') end
+  if Actions.gotoPlayer then buttons[#buttons + 1] = btn('goto', translate('router.s_10aae029a54c', 'Ir até'), 'arrow-right') end
+  if Actions.bringPlayer then buttons[#buttons + 1] = btn('bring', translate('router.s_aeab6abd2cd9', 'Trazer'), 'users') end
+  if Actions.spectate then buttons[#buttons + 1] = btn('spectate', translate('router.s_f66501474ab1', 'Esp.'), 'eye') end
+  if Actions.heal then buttons[#buttons + 1] = btn('heal', translate('router.s_da395f9022ff', 'Curar'), 'heart-pulse') end
+  if Actions.revive then buttons[#buttons + 1] = btn('revive', translate('router.s_659e476f9aad', 'Reviver'), 'kit-medical') end
   if Context.warningsReady and Actions.warningsIssue then
     buttons[#buttons + 1] = btn('warn', 'Warn', 'warning', 'warning')
   end
@@ -264,7 +274,7 @@ playersView = function()
     if query == '' or haystack:find(query, 1, true) then
       local online = p.online == true and tonumber(p.source) and tonumber(p.source) > 0
       local title = (p.characterName and p.characterName ~= '') and p.characterName
-        or p.name or (online and ('ID ' .. tostring(p.source)) or 'Character offline')
+        or p.name or (online and ('ID ' .. tostring(p.source)) or translate('router.s_4d2c3997653f', 'Character offline'))
       local subtitle = online and ('ID %s'):format(tostring(p.source))
         or ('Offline · %s'):format(tostring(p.citizenid or ''))
       if online and tonumber(p.ping) and tonumber(p.ping) > 0 then
@@ -282,8 +292,8 @@ playersView = function()
   return {
     tab = TAB_PLAYERS,
     category = TAB_PLAYERS,
-    title = 'Jogadores',
-    subtitle = PlayerHint and PlayerHint or ('Filtro: %s · %d resultado(s)'):format(PlayerFilter, #PlayerList),
+    title = translate('menu.s_c702ea656c01', 'Jogadores'),
+    subtitle = PlayerHint and PlayerHint or (translate('router.s_1e9d28cee237', 'Filtro: %s · %d resultado(s)')):format(PlayerFilter == 'all' and translate('menu.s_a4114a83f4c6', 'Todos') or (PlayerFilter == 'offline' and 'Offline' or 'Online'), #PlayerList),
     searchable = true,
     query = PlayerQuery,
     workspace = true,
@@ -291,11 +301,11 @@ playersView = function()
     filters = {
       { id = 'online', label = 'Online' },
       { id = 'offline', label = 'Offline' },
-      { id = 'all', label = 'Todos' }
+      { id = 'all', label = translate('menu.s_a4114a83f4c6', 'Todos') }
     },
     activeFilter = PlayerFilter,
     rows = rows,
-    empty = query == '' and 'Nenhum jogador encontrado.' or 'Nenhum jogador encontrado para a busca.'
+    empty = query == '' and translate('router.s_13e67df939ea', 'Nenhum jogador encontrado.') or translate('router.s_98ba36176f0a', 'Nenhum jogador encontrado para a busca.')
   }
 end
 
@@ -305,15 +315,15 @@ local function promptReason(title, extraRow)
   local rows = type(extraRow) == 'table' and extraRow or {}
   rows[#rows + 1] = {
     type = 'textarea',
-    label = 'Motivo',
+    label = translate('menu.s_cbeec536b2f8', 'Motivo'),
     required = true,
     min = 3,
     max = 256,
-    description = 'O motivo sera registrado em auditoria.'
+    description = translate('menu.s_b99d5d3540d4', 'O motivo sera registrado em auditoria.')
   }
   local values = MZAdminUI.InputDialog(title, rows, {
     allowCancel = true,
-    labels = { confirm = 'Confirmar', cancel = 'Cancelar' }
+    labels = { confirm = translate('ui.confirm', 'Confirmar'), cancel = translate('ui.cancel', 'Cancelar') }
   })
   if type(values) ~= 'table' then return nil end
   return values
@@ -325,35 +335,35 @@ local function buildActionRows(p, online)
 
   if online then
     if Actions.gotoPlayer then
-      rows[#rows + 1] = row('Ir até o player', 'O servidor resolve a posicao do alvo.', 'person-walking-arrow-right',
+      rows[#rows + 1] = row(translate('router.s_0178ee04394c', 'Ir até o player'), translate('router.s_37d64f2e163a', 'O servidor resolve a posicao do alvo.'), 'person-walking-arrow-right',
         { primary = { action = 'goto', args = args } })
     end
     if Actions.bringPlayer then
-      rows[#rows + 1] = row('Trazer o player', 'O servidor resolve a posicao do Staff.', 'people-arrows-left-right',
+      rows[#rows + 1] = row(translate('menu.s_ebb84a01ae1e', 'Trazer o player'), translate('router.s_d3ff1d9b732a', 'O servidor resolve a posicao do Staff.'), 'people-arrows-left-right',
         { primary = { action = 'bring', args = args } })
     end
     if Actions.spectate then
-      rows[#rows + 1] = row('Espectar o player', 'Protegido por hierarquia e retorno seguro.', 'binoculars',
+      rows[#rows + 1] = row(translate('menu.s_3f19ca6ec09b', 'Espectar o player'), translate('menu.s_4aefc40744f0', 'Protegido por hierarquia e retorno seguro.'), 'binoculars',
         { primary = { action = 'spectate', args = args } })
     end
     if Actions.heal then
-      rows[#rows + 1] = row('Curar o player', 'Aplica heal no alvo online.', 'heart-pulse',
+      rows[#rows + 1] = row(translate('menu.s_4061a4fcfb15', 'Curar o player'), translate('menu.s_7e99ff5e7cdd', 'Aplica heal no alvo online.'), 'heart-pulse',
         { primary = { action = 'heal', args = args } })
     end
     if Actions.revive then
-      rows[#rows + 1] = row('Reviver o player', 'Aplica revive no alvo online.', 'kit-medical',
+      rows[#rows + 1] = row(translate('menu.s_bcea19a4cc83', 'Reviver o player'), translate('menu.s_43b12c742fd8', 'Aplica revive no alvo online.'), 'kit-medical',
         { primary = { action = 'revive', args = args } })
     end
     if Context.warningsReady and Actions.warningsIssue then
-      rows[#rows + 1] = row('Aplicar advertencia', 'Registra motivo e auditoria.', 'triangle-exclamation',
+      rows[#rows + 1] = row(translate('menu.s_2c5414ebdd8e', 'Aplicar advertencia'), translate('router.s_bd983b4e402e', 'Registra motivo e auditoria.'), 'triangle-exclamation',
         { primary = { action = 'warn', args = args }, tone = 'warning' })
     end
     if Actions.kick then
-      rows[#rows + 1] = row('Remover o player', 'Kick protegido por hierarquia e auditoria.', 'user-xmark',
+      rows[#rows + 1] = row(translate('menu.s_c147cdf6ea1c', 'Remover o player'), translate('menu.s_8815285e811c', 'Kick protegido por hierarquia e auditoria.'), 'user-xmark',
         { primary = { action = 'kick', args = args }, tone = 'danger' })
     end
     if Context.banGuardReady and Actions.ban then
-      rows[#rows + 1] = row('Banir o player', 'BanGuard persiste identifiers e auditoria.', 'user-lock',
+      rows[#rows + 1] = row(translate('menu.s_e5222ebe5bd0', 'Banir o player'), translate('router.s_0bdec94e9380', 'BanGuard persiste identifiers e auditoria.'), 'user-lock',
         { primary = { action = 'ban', args = args }, tone = 'danger' })
     end
   end
@@ -363,8 +373,8 @@ end
 
 local function buildInfoRows(p, online)
   local rows = {
-    row('Nome', tostring(p.characterName or p.name or '-'), 'user'),
-    row('Citizen ID', tostring(p.citizenid or 'indisponivel'), 'address-card'),
+    row(translate('router.s_13030dd962f4', 'Nome'), tostring(p.characterName or p.name or '-'), 'user'),
+    row('Citizen ID', tostring(p.citizenid or translate('router.s_735388ef2f3c', 'indisponivel')), 'address-card'),
     row('Status', online and 'Online' or 'Offline', online and 'circle-check' or 'user-clock',
       { status = { label = online and 'online' or 'offline', variant = online and 'success' or 'neutral' } })
   }
@@ -375,10 +385,10 @@ local function buildInfoRows(p, online)
     end
   end
   if p.accountId then
-    rows[#rows + 1] = row('Conta', ('#%s'):format(tostring(p.accountId)), 'id-card')
+    rows[#rows + 1] = row(translate('router.s_4d07517575be', 'Conta'), ('#%s'):format(tostring(p.accountId)), 'id-card')
   end
   if p.characterId then
-    rows[#rows + 1] = row('Personagem', ('#%s'):format(tostring(p.characterId)), 'id-card')
+    rows[#rows + 1] = row(translate('router.s_e5a2a32e47eb', 'Personagem'), ('#%s'):format(tostring(p.characterId)), 'id-card')
   end
   return rows
 end
@@ -386,7 +396,7 @@ end
 local function buildCharactersRows(p)
   local accountId = tonumber(p.accountId)
   if not accountId then
-    return { empty = 'Conta nao disponivel para este personagem.' }
+    return { empty = translate('router.s_6e30bf51fc99', 'Conta nao disponivel para este personagem.') }
   end
   local data, err = awaitCallback('mz_admin:server:getAccountCharacters', accountId)
   if not data then
@@ -396,18 +406,18 @@ local function buildCharactersRows(p)
   for _, char in ipairs(data.characters or {}) do
     local name = (tostring(char.firstname or '') .. ' ' .. tostring(char.lastname or '')):gsub('%s+', ' '):gsub('^%s+', ''):gsub('%s+$', '')
     rows[#rows + 1] = row(
-      name ~= '' and name or ('Personagem #%s'):format(tostring(char.characterId or '-')),
+      name ~= '' and name or (translate('router.s_d6de34bce578', 'Personagem #%s')):format(tostring(char.characterId or '-')),
       ('CID %s · %s'):format(tostring(char.citizenid or '-'), tostring(char.status or 'active')),
       char.citizenid == p.citizenid and 'circle-check' or 'user'
     )
   end
-  return { rows = rows, empty = 'Nenhum personagem persistido para esta conta.' }
+  return { rows = rows, empty = translate('router.s_9d77ede33219', 'Nenhum personagem persistido para esta conta.') }
 end
 
 local function buildHistoryRows(p)
   local citizenid = tostring(p.citizenid or '')
   if citizenid == '' then
-    return { empty = 'Identidade persistente indisponivel.' }
+    return { empty = translate('router.s_79ac9753140d', 'Identidade persistente indisponivel.') }
   end
   local rows = {}
   if Context.warningsReady and Actions.warningsView then
@@ -425,18 +435,18 @@ local function buildHistoryRows(p)
     for _, ban in ipairs(type(bans) == 'table' and bans.items or {}) do
       rows[#rows + 1] = row(
         ('Ban %s | %s'):format(tostring(ban.publicId or '-'), tostring(ban.reason or '')),
-        ('%s · %s'):format(ban.active == true and 'Ativo' or 'Revogado', displayDate(ban.createdAt)),
+        ('%s · %s'):format(ban.active == true and translate('router.s_8263fde6ccc4', 'Ativo') or translate('router.s_4391b7de4835', 'Revogado'), displayDate(ban.createdAt)),
         ban.active == true and 'lock' or 'unlock'
       )
     end
   end
-  return { rows = rows, empty = 'Nenhum historico de warns/bans para este personagem.' }
+  return { rows = rows, empty = translate('router.s_3eb59093648b', 'Nenhum historico de warns/bans para este personagem.') }
 end
 
 local function buildSecurityRows(p)
   local citizenid = tostring(p.citizenid or '')
   if citizenid == '' or not (Actions.securityAlertsView == true) then
-    return { empty = 'Central de alertas indisponivel para seu contexto.' }
+    return { empty = translate('router.s_bff2d538fcef', 'Central de alertas indisponivel para seu contexto.') }
   end
   local data, err = awaitCallback('mz_admin:server:securityIncidentList', { player = citizenid })
   if not data then
@@ -446,17 +456,17 @@ local function buildSecurityRows(p)
   for _, incident in ipairs(data.incidents or {}) do
     rows[#rows + 1] = row(
       ('[%s] %s'):format(tostring(incident.severity or 'info'):upper(), tostring(incident.playerName or incident.citizenid or '-')),
-      ('%s · risco %d'):format(tostring(incident.human and incident.human.title or incident.code or 'incidente'), tonumber(incident.riskScore) or 0),
+      (translate('router.s_47445204e531', '%s · risco %d')):format(tostring(incident.human and incident.human.title or incident.code or translate('router.s_f430038bf4ad', 'incidente')), tonumber(incident.riskScore) or 0),
       incident.severity == 'critical' and 'triangle-exclamation' or 'shield'
     )
   end
-  return { rows = rows, empty = 'Nenhum incidente de seguranca para este personagem.' }
+  return { rows = rows, empty = translate('router.s_cbd5ef5ed75f', 'Nenhum incidente de seguranca para este personagem.') }
 end
 
 local function buildPunishmentRows(p)
   local citizenid = tostring(p.citizenid or '')
   if citizenid == '' then
-    return { empty = 'Identidade persistente indisponivel.' }
+    return { empty = translate('router.s_79ac9753140d', 'Identidade persistente indisponivel.') }
   end
   local rows = {}
   if Context.banGuardReady and Actions.banView then
@@ -464,7 +474,7 @@ local function buildPunishmentRows(p)
     for _, ban in ipairs(type(bans) == 'table' and bans.items or {}) do
       local buttons = {}
       if ban.active == true and Actions.banRevoke then
-        buttons[#buttons + 1] = btn('revokeBan', 'Revogar', 'unlock', 'danger', { publicId = ban.publicId })
+        buttons[#buttons + 1] = btn('revokeBan', translate('router.s_d4ec79be0fea', 'Revogar'), 'unlock', 'danger', { publicId = ban.publicId })
       end
       rows[#rows + 1] = row(
         ('%s'):format(tostring(ban.publicId or '-')),
@@ -474,28 +484,28 @@ local function buildPunishmentRows(p)
       )
     end
   end
-  return { rows = rows, empty = 'Nenhuma punicao ativa para este personagem.' }
+  return { rows = rows, empty = translate('router.s_21671996d6e9', 'Nenhuma punicao ativa para este personagem.') }
 end
 
 local function openPlayerModal(p)
   if not p then return end
   SelectedPlayer = p
   local online = p.online == true and tonumber(p.source) and tonumber(p.source) > 0
-  local title = (p.characterName and p.characterName ~= '') and p.characterName or p.name or 'Jogador'
+  local title = (p.characterName and p.characterName ~= '') and p.characterName or p.name or translate('router.s_a87c0c205c1d', 'Jogador')
 
   MZAdminUI.SetTabletModal({
     title = title,
-    subtitle = online and ('Online · ID %s'):format(tostring(p.source)) or 'Offline · consulta persistida',
+    subtitle = online and ('Online · ID %s'):format(tostring(p.source)) or translate('router.s_fb9982f5b139', 'Offline · consulta persistida'),
     tabs = {
-      { id = 'actions', label = 'Ações', icon = 'bolt' },
-      { id = 'info', label = 'Informações', icon = 'info' },
-      { id = 'characters', label = 'Personagens', icon = 'users' },
-      { id = 'history', label = 'Histórico', icon = 'history' },
-      { id = 'security', label = 'Segurança', icon = 'shield' },
-      { id = 'punishments', label = 'Punições', icon = 'ban' }
+      { id = 'actions', label = translate('menu.s_66c341b3e963', 'Ações'), icon = 'bolt' },
+      { id = 'info', label = translate('menu.s_a3ac9377628f', 'Informações'), icon = 'info' },
+      { id = 'characters', label = translate('menu.s_792ba986413d', 'Personagens'), icon = 'users' },
+      { id = 'history', label = translate('menu.s_bea29e92ac2b', 'Histórico'), icon = 'history' },
+      { id = 'security', label = translate('menu.s_27a0286c70df', 'Segurança'), icon = 'shield' },
+      { id = 'punishments', label = translate('menu.s_828cedfdd76d', 'Punições'), icon = 'ban' }
     },
     content = {
-      actions = { rows = buildActionRows(p, online), empty = 'Jogador offline: acoes em tempo real indisponiveis.' },
+      actions = { rows = buildActionRows(p, online), empty = translate('router.s_3f7ec1cebfea', 'Jogador offline: acoes em tempo real indisponiveis.') },
       info = { rows = buildInfoRows(p, online) },
       characters = buildCharactersRows(p),
       history = buildHistoryRows(p),
@@ -521,44 +531,44 @@ end
 
 local function kickPlayer(args)
   local source, citizenid = targetArgs(args)
-  local values = promptReason(('Remover player (ID %s)'):format(tostring(source)))
+  local values = promptReason((translate('router.s_69a3815fa794', 'Remover player (ID %s)')):format(tostring(source)))
   if not values then return end
   local reason = tostring(values[1] or ''):gsub('%c', ' '):gsub('^%s+', ''):gsub('%s+$', '')
-  if #reason < 3 then notify('Motivo muito curto.', 'error') return end
+  if #reason < 3 then notify(translate('router.s_53067c623d62', 'Motivo muito curto.'), 'error') return end
   local data, err = awaitCallback('mz_admin:server:tabletKick', source, reason, citizenid)
-  if not data then notify(errorMessage(err), 'error') else notify('Player removido.', 'success') end
+  if not data then notify(errorMessage(err), 'error') else notify(translate('router.s_7528901eedb7', 'Player removido.'), 'success') end
 end
 
 local function banPlayer(args)
   local source, citizenid = targetArgs(args)
-  local values = promptReason(('Banir player (ID %s)'):format(tostring(source)), {
-    { type = 'input', label = 'Duracao', default = 'perm', required = true, min = 1, max = 16, description = 'Use perm, 30m, 12h ou 7d.' }
+  local values = promptReason((translate('router.s_125b2a4ee013', 'Banir player (ID %s)')):format(tostring(source)), {
+    { type = 'input', label = translate('menu.s_9bd8554a89a4', 'Duracao'), default = 'perm', required = true, min = 1, max = 16, description = translate('menu.s_9f5bb500ed8c', 'Use perm, 30m, 12h ou 7d.') }
   })
   if not values then return end
   local duration = tostring(values[1] or ''):gsub('%c', ''):gsub('^%s+', ''):gsub('%s+$', '')
   local reason = tostring(values[2] or ''):gsub('%c', ' '):gsub('^%s+', ''):gsub('%s+$', '')
-  if duration == '' or #reason < 3 then notify('Preencha duracao e motivo.', 'error') return end
+  if duration == '' or #reason < 3 then notify(translate('router.s_e844a2af1255', 'Preencha duracao e motivo.'), 'error') return end
   local data, err = awaitCallback('mz_admin:server:createBan', source, duration, reason, citizenid)
-  if not data then notify(errorMessage(err), 'error') else notify(('Ban criado: %s'):format(tostring(data.ban and data.ban.publicId or '')), 'success') end
+  if not data then notify(errorMessage(err), 'error') else notify((translate('router.s_47b6fffe1309', 'Ban criado: %s')):format(tostring(data.ban and data.ban.publicId or '')), 'success') end
 end
 
 local function warnPlayer(args)
   local source, citizenid = targetArgs(args)
-  local values = promptReason(('Advertir player (ID %s)'):format(tostring(source)))
+  local values = promptReason((translate('router.s_2357eb06bbd7', 'Advertir player (ID %s)')):format(tostring(source)))
   if not values then return end
   local reason = tostring(values[1] or ''):gsub('%c', ' '):gsub('^%s+', ''):gsub('%s+$', '')
-  if #reason < 3 then notify('Motivo muito curto.', 'error') return end
+  if #reason < 3 then notify(translate('router.s_53067c623d62', 'Motivo muito curto.'), 'error') return end
   local data, err = awaitCallback('mz_admin:server:issueWarning', source, reason, citizenid)
-  if not data then notify(errorMessage(err), 'error') else notify('Advertencia aplicada.', 'success') end
+  if not data then notify(errorMessage(err), 'error') else notify(translate('router.s_f6abd08052e7', 'Advertencia aplicada.'), 'success') end
 end
 
 local function revokeBan(publicId)
-  local values = promptReason('Revogar banimento')
+  local values = promptReason(translate('router.s_3081c2977f16', 'Revogar banimento'))
   if not values then return end
   local reason = tostring(values[1] or ''):gsub('%c', ' '):gsub('^%s+', ''):gsub('%s+$', '')
-  if #reason < 3 then notify('Motivo muito curto.', 'error') return end
+  if #reason < 3 then notify(translate('router.s_53067c623d62', 'Motivo muito curto.'), 'error') return end
   local data, err = awaitCallback('mz_admin:server:revokeBan', tostring(publicId):upper(), reason)
-  if not data then notify(errorMessage(err), 'error') else notify(('Ban revogado: %s'):format(tostring(publicId)), 'success') end
+  if not data then notify(errorMessage(err), 'error') else notify((translate('router.s_92a63c204352', 'Ban revogado: %s')):format(tostring(publicId)), 'success') end
 end
 
 local function handleModalAction(action, args)
@@ -579,11 +589,11 @@ local function handleModalAction(action, args)
   elseif action == 'heal' then
     local source, citizenid = targetArgs(args)
     local data, err = awaitCallback('mz_admin:server:tabletHeal', source, citizenid)
-    if not data then notify(errorMessage(err), 'error') else notify('Player curado.', 'success') end
+    if not data then notify(errorMessage(err), 'error') else notify(translate('router.s_a0d40fafa6d2', 'Player curado.'), 'success') end
   elseif action == 'revive' then
     local source, citizenid = targetArgs(args)
     local data, err = awaitCallback('mz_admin:server:tabletRevive', source, citizenid)
-    if not data then notify(errorMessage(err), 'error') else notify('Player revivido.', 'success') end
+    if not data then notify(errorMessage(err), 'error') else notify(translate('router.s_4268feb19188', 'Player revivido.'), 'success') end
   elseif action == 'warn' then
     warnPlayer(args)
   elseif action == 'kick' then
@@ -603,7 +613,7 @@ local function handleAction(action, args)
   elseif action == 'tpm' then
     runClientCommand(Config.Commands.tpm or 'tpm')
   elseif action == 'tpHelp' then
-    notify(('Use /%s x y z [heading] para informar as coordenadas.'):format(Config.Commands.tp or 'tp'), 'inform')
+    notify((translate('router.s_8d1a3f92444c', 'Use /%s x y z [heading] para informar as coordenadas.')):format(Config.Commands.tp or 'tp'), 'inform')
   elseif action == 'loc' then
     runClientCommand(Config.Commands.loc or 'loc')
   elseif action == 'wall' then
@@ -613,13 +623,13 @@ local function handleAction(action, args)
     if not data then notify(errorMessage(err), 'error') end
   elseif action == 'selfHeal' then
     local data, err = awaitCallback('mz_admin:server:tabletHeal', selfTarget(), nil)
-    if not data then notify(errorMessage(err), 'error') else notify('Vida restaurada.', 'success') end
+    if not data then notify(errorMessage(err), 'error') else notify(translate('router.s_22db1bd461ab', 'Vida restaurada.'), 'success') end
   elseif action == 'selfRevive' then
     local data, err = awaitCallback('mz_admin:server:tabletRevive', selfTarget(), nil)
-    if not data then notify(errorMessage(err), 'error') else notify('Revive concluido.', 'success') end
+    if not data then notify(errorMessage(err), 'error') else notify(translate('router.s_8661a35a5c98', 'Revive concluido.'), 'success') end
   elseif action == 'selfArmor' then
     local data, err = awaitCallback('mz_admin:server:tabletArmor', 100)
-    if not data then notify(errorMessage(err), 'error') else notify('Colete definido para 100.', 'success') end
+    if not data then notify(errorMessage(err), 'error') else notify(translate('router.s_663497dc3cde', 'Colete definido para 100.'), 'success') end
   elseif action == 'selfGodmode' then
     runClientCommand(Config.Commands.godMode or 'godmode')
   end
@@ -660,8 +670,8 @@ end
 
 local function buildNavigationTabs()
   local tabs = {
-    { id = TAB_MAIN, label = 'INÍCIO', icon = 'home' },
-    { id = TAB_PLAYERS, label = 'JOGADORES', icon = 'user-search' }
+    { id = TAB_MAIN, label = translate('menu.s_3b2c8bf51797', 'INÍCIO'), icon = 'home' },
+    { id = TAB_PLAYERS, label = translate('menu.s_32b8840c22ca', 'JOGADORES'), icon = 'user-search' }
   }
   NavigationTabs = {}
   if type(MZAdminMenu.GetNavigationTabs) == 'function' then
@@ -685,7 +695,7 @@ end
 function MZAdminRouter.Open(inputMode)
   inputMode = inputMode == 'free' and 'free' or 'blocked'
   if not (cfg()).Enabled then
-    notify('Tablet administrativo desativado.', 'error')
+    notify(translate('router.s_6f19de0a4ff5', 'Tablet administrativo desativado.'), 'error')
     return false
   end
   if not menuReady() then
@@ -823,7 +833,7 @@ CreateThread(function()
         local context = MZAdminClient.GetMenuContext(true)
         if not context then
           MZAdminRouter.Close()
-          notify('Sua permissao administrativa foi revogada ou a sessao expirou.', 'error')
+          notify(translate('router.s_3151999b88ef', 'Sua permissao administrativa foi revogada ou a sessao expirou.'), 'error')
         else
           Actions = type(context.actions) == 'table' and context.actions or {}
           Context = context

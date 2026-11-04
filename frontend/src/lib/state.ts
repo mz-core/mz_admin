@@ -36,6 +36,7 @@ export const emptyTablet: TabletState = {
 }
 
 export const initialState: AppState = {
+  locale: "pt-br",
   theme: {
     accent: "#009fe3",
     accent2: "#67c9f1",
@@ -58,6 +59,7 @@ export const initialState: AppState = {
 }
 
 export type Action =
+  | { type: "locale"; locale: string }
   | { type: "theme"; theme?: Partial<Theme>; brand?: string }
   | { type: "movementMode"; enabled?: boolean; key?: string; toggleEnabled?: boolean }
   | { type: "openContext"; menu: ContextMenu }
@@ -205,7 +207,7 @@ function playerSelectorState(payload: PlayerSelectorPayload) {
     total: 0,
     hasMore: false,
     hint: "",
-    summary: "Buscando jogadores online…",
+    summary: "",
     loading: true,
   }
 }
@@ -223,6 +225,9 @@ function notifyState(data: NotifyPayload) {
 
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
+    case "locale": {
+      return { ...state, locale: action.locale }
+    }
     case "theme": {
       return {
         ...state,
@@ -304,6 +309,7 @@ export function reducer(state: AppState, action: Action): AppState {
       const tabs = Array.isArray(model.tabs) ? model.tabs : []
       return {
         ...state,
+        locale: model.locale || state.locale,
         panel: {
           open: false,
           mode: "context",
@@ -442,7 +448,7 @@ export function reducer(state: AppState, action: Action): AppState {
             hasMore: action.result.hasMore === true,
             total,
             hint,
-            summary: hint || `${items.length} de ${total} resultado(s)`,
+            summary: hint,
             loading: false,
           },
         },
@@ -475,7 +481,7 @@ export function reducer(state: AppState, action: Action): AppState {
           selector: {
             ...selector,
             filter: action.filter,
-            summary: "Buscando…",
+            summary: "",
             loading: true,
           },
         },
@@ -489,7 +495,7 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         panel: {
           ...state.panel,
-          selector: { ...selector, summary: "Buscando…", loading: true },
+          selector: { ...selector, summary: "", loading: true },
         },
       }
     }

@@ -294,6 +294,7 @@ export type DialogState =
   | { kind: "alert"; payload: AlertDialogPayload }
 
 export type AppState = {
+  locale: string
   theme: Theme
   brand: string
   movement: MovementState
@@ -305,6 +306,7 @@ export type AppState = {
 
 export type NuiMessage = {
   action?: string
+  locale?: string
   theme?: Partial<Theme>
   brand?: string
   menu?: ContextMenu

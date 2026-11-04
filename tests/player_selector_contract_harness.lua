@@ -41,4 +41,22 @@ expect(app:find('event.key === "Enter"', 1, true), 'navegacao Enter ausente')
 expect(css:lower():find('#009fe3', 1, true), 'identidade visual azul MZ ausente')
 expect(css:lower():find('#090c11', 1, true), 'dark base MZ ausente')
 
+local selectedOptions
+MZAdminUI = {
+  PlayerSelector = function(options) selectedOptions = options return nil end,
+  Notify = function() end
+}
+exports = function() end
+locale = function(key)
+  return ({ ['selector.title'] = 'Select player', ['selector.subtitle'] = 'Search offline',
+    ['selector.search'] = 'Search', ['selector.unavailable'] = 'Unavailable' })[key] or key
+end
+dofile('mz_admin/client/player_selector.lua')
+MZAdminPlayerSelector.Select({})
+expect(selectedOptions.title == 'Select player' and selectedOptions.searchPlaceholder == 'Search',
+  'seletor nao utiliza traducoes do locale')
+locale = nil
+MZAdminPlayerSelector.Select({})
+expect(selectedOptions.title == 'Selecionar jogador', 'fallback do seletor nao e portugues')
+
 print('mz_admin player selector contract harness: PASS')

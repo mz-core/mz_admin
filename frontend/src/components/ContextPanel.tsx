@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/locale"
 import { useEffect, useRef } from "react"
 import { Icon } from "@/components/Icon"
 import { EmptyState, OptionButton, PlayerOption, Pill } from "@/components/OptionButton"
@@ -43,6 +44,7 @@ export function ContextPanel({
   onFilter,
   onMovementToggle,
 }: ContextPanelProps) {
+  const t = useTranslation()
   const panel = state.panel
   const menu = panel.menu
   const selector = panel.mode === "selector" ? panel.selector : null
@@ -60,11 +62,11 @@ export function ContextPanel({
   }, [panel.open, focused, panel.search, isSelector, selector?.items.length])
 
   const placeholder = selector
-    ? selector.searchPlaceholder || "Nome, Character, citizenid ou source…"
-    : menu?.searchPlaceholder || "Buscar ferramenta…"
+    ? selector.searchPlaceholder || t("search_player")
+    : menu?.searchPlaceholder || t("search_tool")
   const searchable = isSelector || menu?.searchable === true
   const brand = selector ? selector.brand || state.brand : menu?.brand || state.brand
-  const title = selector ? selector.title || "Selecionar jogador" : menu?.title || "Menu"
+  const title = selector ? selector.title || t("select_player") : menu?.title || "Menu"
   const subtitle = selector ? selector.subtitle || "" : menu?.subtitle || ""
   const backVisible = isSelector ? true : Boolean(menu?.menu)
   const user = menu?.user
@@ -89,8 +91,8 @@ export function ContextPanel({
           id="backBtn"
           className={`mz-icon-btn${backVisible ? "" : " hidden"}`}
           type="button"
-          title="Voltar"
-          aria-label="Voltar"
+          title={t("back")}
+          aria-label={t("back")}
           onClick={onBack}
         >
           <Icon name="arrow-left" />
@@ -118,7 +120,7 @@ export function ContextPanel({
             <span id="menuSubtitle" className={subtitle ? "" : "hidden"}>{subtitle}</span>
           </p>
         </div>
-        <button id="closeBtn" className="mz-icon-btn" type="button" title="Fechar" aria-label="Fechar" onClick={onClose}>
+        <button id="closeBtn" className="mz-icon-btn" type="button" title={t("close")} aria-label={t("close")} onClick={onClose}>
           <Icon name="x" />
         </button>
       </header>
@@ -135,7 +137,7 @@ export function ContextPanel({
               </span>
               <span className="mz-userCard__body">
                 <strong>{user.name || "Staff"}</strong>
-                <small>{user.subtitle || "Sessão administrativa"}</small>
+                <small>{user.subtitle || t("session")}</small>
               </span>
               <Pill text={user.role || "STAFF"} variant={user.variant || "info"} className="mz-userCard__role" />
             </>
@@ -158,7 +160,7 @@ export function ContextPanel({
           type="text"
           autoComplete="off"
           spellCheck={false}
-          aria-label="Buscar no menu"
+          aria-label={t("search_menu")}
           placeholder={placeholder}
           value={panel.search}
           onChange={(event) => onSearch(event.target.value)}
@@ -170,7 +172,7 @@ export function ContextPanel({
         id="selectorFilters"
         className={`mz-selectorFilters${selector ? "" : " hidden"}`}
         role="group"
-        aria-label="Filtrar jogadores"
+        aria-label={t("filter_players")}
       >
         {selector
           ? selector.filters.map((filter) => (
@@ -181,7 +183,7 @@ export function ContextPanel({
                 key={filter}
                 onClick={() => onFilter(filter)}
               >
-                {selectorFilterLabel(filter)}
+                {filter === "all" ? t("all") : selectorFilterLabel(filter)}
               </button>
             ))
           : null}
@@ -191,13 +193,13 @@ export function ContextPanel({
         className={`mz-selectorSummary${selector ? "" : " hidden"}`}
         aria-live="polite"
       >
-        {selector ? selector.summary : ""}
+        {selector ? (selector.loading ? t("searching") : selector.summary || t("result_count").replace("{shown}", String(selector.items.length)).replace("{total}", String(selector.total))) : ""}
       </p>
 
       <div id="options" className="mz-options scrollbar-thin" ref={optionsRef}>
         {selector ? (
           selector.loading && selector.items.length === 0 ? (
-            <EmptyState title="Buscando…" />
+            <EmptyState title={t("searching")} />
           ) : selector.items.length ? (
             <>
               {selector.items.map((item, index) => (
@@ -212,8 +214,8 @@ export function ContextPanel({
                 <button className="option selector-more" type="button" onClick={(event) => onMore(event.currentTarget)}>
                   <span className="option__icon">+</span>
                   <span className="option__body">
-                    <span className="option__title">Carregar mais</span>
-                    <span className="option__desc">Próxima página de Characters</span>
+                    <span className="option__title">{t("load_more")}</span>
+                    <span className="option__desc">{t("next_players")}</span>
                   </span>
                   <span className="option__right" />
                 </button>
@@ -221,8 +223,8 @@ export function ContextPanel({
             </>
           ) : (
             <EmptyState
-              title={selector.hint || "Nenhum jogador encontrado."}
-              detail="Tente outro nome, citizenid ou source."
+              title={selector.hint || t("no_player")}
+              detail={t("try_other")}
             />
           )
         ) : menu && (menu.options?.length ?? 0) > 0 ? (
@@ -242,26 +244,26 @@ export function ContextPanel({
           })
         ) : (
           <EmptyState
-            title="Nenhuma opção disponível"
-            detail="As permissões podem limitar este menu."
+            title={t("no_options")}
+            detail={t("permissions_hint")}
           />
         )}
       </div>
 
       <footer className="mz-panel__footer">
-        <span><b>↑ ↓</b> navegar</span>
-        <span><b>Enter</b> selecionar</span>
-        <span><b>Esc</b> voltar</span>
+        <span><b>↑ ↓</b> {t("navigate")}</span>
+        <span><b>Enter</b> {t("select")}</span>
+        <span><b>Esc</b> {t("back_hint")}</span>
         <button
           id="focusToggleBtn"
           className={`mz-panel__focusToggle${state.movement.toggleEnabled ? "" : " hidden"}`}
           type="button"
-          aria-label={state.movement.enabled ? "Travar movimento" : "Liberar movimento"}
+          aria-label={state.movement.enabled ? t("lock_movement") : t("unlock_movement")}
           onClick={onMovementToggle}
         >
           <b id="focusToggleKey">{state.movement.key}</b>
           <span id="focusToggleLabel">
-            {state.movement.enabled ? "travar movimento" : "liberar movimento"}
+            {state.movement.enabled ? t("lock_movement") : t("unlock_movement")}
           </span>
         </button>
       </footer>

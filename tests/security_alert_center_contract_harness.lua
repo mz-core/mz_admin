@@ -17,6 +17,7 @@ local manifest = read('fxmanifest.lua')
 local permissions = read('shared/permissions.lua')
 local client = read('client/security_alerts.lua')
 local server = read('server/security_alerts.lua')
+local english = read('locales/en-us.json')
 
 check(manifest:find("'client/security_alerts.lua'", 1, true) ~= nil, 'client module is in manifest')
 check(manifest:find("'server/security_alerts.lua'", 1, true) ~= nil, 'server module is in manifest')
@@ -26,8 +27,10 @@ check(permissions:find('securityAlertGoto', 1, true) ~= nil, 'goto permission is
 check(client:find('Nenhum incidente encontrado', 1, true) ~= nil, 'empty menu state exists')
 check(client:find("item.severity == 'critical'", 1, true) ~= nil, 'critical incident presentation exists')
 check(client:find('ALERTAS %d', 1, true) ~= nil, 'unacknowledged badge fallback exists')
-check(client:find("runtime = 'Runtime client'", 1, true) ~= nil
-  and client:find("canary = 'Canarios'", 1, true) ~= nil
+check(client:find("runtime = (type(locale) == 'function'", 1, true) ~= nil
+  and client:find("canary = (type(locale) == 'function'", 1, true) ~= nil
+  and english:find('"s_36a55c366f72": "Client runtime"', 1, true) ~= nil
+  and english:find('"s_79945f0dfe7d": "Canaries"', 1, true) ~= nil
   and client:find('canary_triggered', 1, true) ~= nil,
   'V3 runtime/canary filters and labels are exposed')
 check(client:find('TriggerServerEvent', 1, true) == nil, 'client has no direct incident mutation event')

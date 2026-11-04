@@ -105,7 +105,7 @@ expect(serverSecurity:find("GetCharactersForAccount", 1, true) ~= nil, 'personag
 -- feature flag reversivel.
 expect(config:find('Tablet = {', 1, true) ~= nil, 'flag Config.Tablet ausente')
 expect(config:find('Enabled = true', 1, true) ~= nil, 'flag de habilitacao ausente')
-expect(config:find("GetConvar('locale', 'pt-BR')", 1, true) ~= nil, 'locale global nao e herdado do servidor')
+expect(config:find("GetConvar('ox:locale', 'pt-br')", 1, true) ~= nil, 'locale global nao e herdado do servidor')
 expect(adminRouter:find("locale = tostring(Config.Locale or 'pt-BR')", 1, true) ~= nil, 'locale nao chega ao modelo da NUI')
 expect(adminApp:find('document.documentElement.lang', 1, true) ~= nil, 'NUI nao aplica o locale global')
 expect(manifest:find('client/router.lua', 1, true) ~= nil, 'client/router.lua ausente do manifest')

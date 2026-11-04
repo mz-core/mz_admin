@@ -57,7 +57,7 @@ end, false)
 if (cfg()).Enabled and type((cfg()).OpenKey) == 'string' and (cfg()).OpenKey ~= '' then
   RegisterKeyMapping(
     'mz_admin_tablet_toggle',
-    'Abrir/fechar o painel administrativo MZ',
+    (type(locale) == 'function' and locale('tablet.key_toggle') or 'Abrir/fechar o painel administrativo MZ'),
     'keyboard',
     (cfg()).OpenKey
   )

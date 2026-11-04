@@ -28,7 +28,7 @@ end
 
 local function notifyDenied(sourceId, message)
   TriggerClientEvent('chat:addMessage', sourceId, {
-    args = { 'Admin', message or 'Acao negada.' }
+    args = { 'Admin', message or (type(locale) == 'function' and locale('server_messages.s_a6371027aa0e') or 'Acao negada.') }
   })
 end
 
@@ -36,8 +36,8 @@ local function authorize(sourceId, action)
   local allowed, reason = MZAdminSecurity.Authorize(sourceId, action)
   if not allowed then
     notifyDenied(sourceId, reason == 'rate_limited'
-      and 'Aguarde um instante antes de repetir esta acao.'
-      or 'Sem permissao para esta acao.')
+      and (type(locale) == 'function' and locale('errors.rate_limited') or 'Aguarde um instante antes de repetir esta acao.')
+      or (type(locale) == 'function' and locale('errors.permission_denied') or 'Sem permissao para esta acao.'))
     return false, reason
   end
   return true, reason
@@ -148,11 +148,11 @@ local function resolveTargetHierarchy(sourceId, targetId)
 end
 
 local function hierarchyDeniedMessage(reason)
-  if reason == 'target_owner' then return 'O Staff Supremo esta protegido.' end
-  if reason == 'target_higher_or_equal' then return 'Voce nao pode agir sobre Staff de nivel igual ou superior.' end
-  if reason == 'actor_without_staff_level' then return 'Seu contexto Staff nao possui nivel para agir sobre este alvo.' end
-  if reason == 'target_not_loaded' then return 'Contexto do alvo indisponivel.' end
-  return 'Acao negada pela hierarquia Staff.'
+  if reason == 'target_owner' then return (type(locale) == 'function' and locale('server_messages.s_973bfc122a24') or 'O Staff Supremo esta protegido.') end
+  if reason == 'target_higher_or_equal' then return (type(locale) == 'function' and locale('server_messages.s_526c03d48ff3') or 'Voce nao pode agir sobre Staff de nivel igual ou superior.') end
+  if reason == 'actor_without_staff_level' then return (type(locale) == 'function' and locale('server_messages.s_7c1d8b431b8a') or 'Seu contexto Staff nao possui nivel para agir sobre este alvo.') end
+  if reason == 'target_not_loaded' then return (type(locale) == 'function' and locale('server_messages.s_c51696d14ec9') or 'Contexto do alvo indisponivel.') end
+  return (type(locale) == 'function' and locale('server_messages.s_a79c9708ba32') or 'Acao negada pela hierarquia Staff.')
 end
 
 local function authorizeTargetAction(sourceId, targetId, action, preflight, auditMeta, expectedCitizenid)
@@ -161,15 +161,15 @@ local function authorizeTargetAction(sourceId, targetId, action, preflight, audi
   if not allowed then
     auditTargetAction(sourceId, targetId, action, false, reason)
     notifyDenied(sourceId, reason == 'rate_limited'
-      and 'Aguarde um instante antes de repetir esta acao.'
-      or 'Sem permissao para esta acao.')
+      and (type(locale) == 'function' and locale('errors.rate_limited') or 'Aguarde um instante antes de repetir esta acao.')
+      or (type(locale) == 'function' and locale('errors.permission_denied') or 'Sem permissao para esta acao.'))
     return nil
   end
 
   targetId = validOnlinePlayer(targetId)
   if not targetId then
     auditTargetAction(sourceId, requestedTargetId, action, false, 'invalid_target')
-    notifyDenied(sourceId, 'Player invalido.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_c3f6ae238137') or 'Player invalido.'))
     return nil
   end
 
@@ -180,7 +180,7 @@ local function authorizeTargetAction(sourceId, targetId, action, preflight, audi
   )
   if identityValid ~= true then
     auditTargetAction(sourceId, targetId, action, false, identityReason or 'stale_target')
-    notifyDenied(sourceId, 'O alvo mudou de sessao. Selecione novamente.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_85f4cce991a5') or 'O alvo mudou de sessao. Selecione novamente.'))
     return nil
   end
 
@@ -196,13 +196,13 @@ local function authorizeTargetAction(sourceId, targetId, action, preflight, audi
     if preflightOk ~= true then
       preflightReason = preflightReason or 'preflight_failed'
       auditTargetAction(sourceId, targetId, action, false, preflightReason, hierarchy)
-      notifyDenied(sourceId, preflightMessage or 'Acao indisponivel neste momento.')
+      notifyDenied(sourceId, preflightMessage or (type(locale) == 'function' and locale('server_messages.s_17240e08cfa2') or 'Acao indisponivel neste momento.'))
       return nil
     end
   end
 
   if not auditTargetAction(sourceId, targetId, action, true, hierarchyReason, hierarchy, auditMeta) then
-    notifyDenied(sourceId, 'Auditoria administrativa indisponivel. Acao cancelada.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_57d28431f353') or 'Auditoria administrativa indisponivel. Acao cancelada.'))
     return nil
   end
 
@@ -283,13 +283,13 @@ RegisterNetEvent('mz_admin:server:gotoPlayer', function(targetId)
 
   targetId = validOnlinePlayer(targetId)
   if not targetId then
-    notifyDenied(sourceId, 'Player invalido.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_c3f6ae238137') or 'Player invalido.'))
     return
   end
 
   local targetPed = GetPlayerPed(targetId)
   if targetPed == 0 then
-    notifyDenied(sourceId, 'Ped do player indisponivel.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_48f2003c3997') or 'Ped do player indisponivel.'))
     return
   end
 
@@ -307,7 +307,7 @@ RegisterNetEvent('mz_admin:server:bringPlayer', function(targetId, expectedCitiz
   targetId = authorizeTargetAction(sourceId, targetId, 'bringPlayer', function()
     actorPed = GetPlayerPed(sourceId)
     if actorPed == 0 then
-      return false, 'actor_ped_unavailable', 'Ped do Staff indisponivel.'
+      return false, 'actor_ped_unavailable', (type(locale) == 'function' and locale('server_messages.s_3bd261f8ff21') or 'Ped do Staff indisponivel.')
     end
     return true
   end, nil, expectedCitizenid)
@@ -329,16 +329,16 @@ RegisterNetEvent('mz_admin:server:kickPlayer', function(targetId, reason, expect
 
   targetId = authorizeTargetAction(sourceId, targetId, 'kick', function(resolvedTarget)
     if resolvedTarget == sourceId then
-      return false, 'self_target', 'Voce nao pode remover a si mesmo.'
+      return false, 'self_target', (type(locale) == 'function' and locale('server_messages.s_56aeb9a2b624') or 'Voce nao pode remover a si mesmo.')
     end
     if #reason < 3 then
-      return false, 'invalid_reason', 'Informe um motivo com pelo menos 3 caracteres.'
+      return false, 'invalid_reason', (type(locale) == 'function' and locale('errors.invalid_reason') or 'Informe um motivo com pelo menos 3 caracteres.')
     end
     return true
   end, { message = reason }, expectedCitizenid)
   if not targetId then return end
 
-  DropPlayer(targetId, ('Voce foi removido pela Staff.\nMotivo: %s'):format(reason))
+  DropPlayer(targetId, ((type(locale) == 'function' and locale('server_messages.s_0e836f0e3915') or 'Voce foi removido pela Staff.\nMotivo: %s')):format(reason))
 end)
 
 RegisterNetEvent('mz_admin:server:healPlayer', function(targetId)
@@ -351,7 +351,7 @@ RegisterNetEvent('mz_admin:server:healPlayer', function(targetId)
     })
   end)
   if not ok or changed ~= true then
-    notifyDenied(sourceId, 'Estado canonico indisponivel.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('errors.status_unavailable') or 'Estado canonico indisponivel.'))
     return
   end
   -- shortcut: vida e sobrevivencia usam owners distintos; criar operacao composta somente se atomicidade virar requisito.
@@ -361,7 +361,7 @@ RegisterNetEvent('mz_admin:server:healPlayer', function(targetId)
     })
   end)
   if not survivalOk or survivalChanged ~= true then
-    notifyDenied(sourceId, 'Vida restaurada, mas fome e sede nao puderam ser restauradas.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_a57386714572') or 'Vida restaurada, mas fome e sede nao puderam ser restauradas.'))
     return
   end
   TriggerClientEvent('mz_admin:client:stateActionConfirmed', targetId, 'heal')
@@ -377,7 +377,7 @@ RegisterNetEvent('mz_admin:server:revivePlayer', function(targetId)
     })
   end)
   if not ok or changed ~= true then
-    notifyDenied(sourceId, 'Estado canonico indisponivel.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('errors.status_unavailable') or 'Estado canonico indisponivel.'))
     return
   end
   TriggerClientEvent('mz_admin:client:stateActionConfirmed', targetId, 'revive')
@@ -395,7 +395,7 @@ RegisterNetEvent('mz_admin:server:setArmor', function(amount)
     })
   end)
   if not ok or changed ~= true then
-    notifyDenied(sourceId, 'Estado canonico indisponivel.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('errors.status_unavailable') or 'Estado canonico indisponivel.'))
     return
   end
   TriggerClientEvent('mz_admin:client:stateActionConfirmed', sourceId, 'armor', amount)

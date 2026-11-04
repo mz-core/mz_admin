@@ -445,8 +445,8 @@ lib.callback.register('mz_admin:server:searchPlayers', function(source, request)
   if filter ~= 'online' then
     if #query < 2 then
       hint = filter == 'offline'
-        and 'Digite ao menos 2 caracteres para buscar Characters offline.'
-        or 'Online primeiro. Digite ao menos 2 caracteres para incluir offline.'
+        and (type(locale) == 'function' and locale('server_messages.s_f2652510586d') or 'Digite ao menos 2 caracteres para buscar Characters offline.')
+        or (type(locale) == 'function' and locale('server_messages.s_76010fa3c0b1') or 'Online primeiro. Digite ao menos 2 caracteres para incluir offline.')
     elseif GetResourceState('mz_core') == 'started' then
       local callOk, result = pcall(function()
         return exports['mz_core']:SearchCharacters(query, page, pageSize)
@@ -474,10 +474,10 @@ lib.callback.register('mz_admin:server:searchPlayers', function(source, request)
           end
         end
       else
-        hint = 'Busca offline indisponivel no momento.'
+        hint = (type(locale) == 'function' and locale('server_messages.s_3089c4f978ae') or 'Busca offline indisponivel no momento.')
       end
     else
-      hint = 'Busca offline indisponivel no momento.'
+      hint = (type(locale) == 'function' and locale('server_messages.s_3089c4f978ae') or 'Busca offline indisponivel no momento.')
     end
   end
 

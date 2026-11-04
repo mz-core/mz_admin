@@ -1,3 +1,4 @@
+import { useTranslation } from "@/lib/locale"
 import { Icon } from "@/components/Icon"
 import { metadataValues, safeVariant, searchableText } from "@/lib/format"
 import type { MenuOption, PlayerSelectorItem, Variant } from "@/lib/types"
@@ -37,6 +38,7 @@ export function OptionButton({
   filtered?: boolean
   onSelect?: (element: HTMLButtonElement) => void
 }) {
+  const t = useTranslation()
   if (String(option.type || "").toLowerCase() === "section") {
     return (
       <div className="option-section">
@@ -79,7 +81,7 @@ export function OptionButton({
       </span>
       <span className="option__body">
         <span className="option__titleRow">
-          <span className="option__title">{option.title || "Opção"}</span>
+          <span className="option__title">{option.title || t("option")}</span>
           <Pill text={option.badge} variant={option.badgeVariant || "neutral"} />
         </span>
         {option.description ? <span className="option__desc">{option.description}</span> : null}
@@ -119,14 +121,15 @@ export function PlayerOption({
   focused?: boolean
   onSelect?: (element: HTMLButtonElement) => void
 }) {
+  const t = useTranslation()
   const online = item.online === true && Number(item.source) > 0
   const characterName = String(item.characterName || "").trim()
   const sessionName = String(item.name || "").trim()
-  const title = characterName || sessionName || "Character sem nome"
+  const title = characterName || sessionName || t("unknown_character")
   const details: string[] = []
   if (sessionName && sessionName.toLowerCase() !== title.toLowerCase()) details.push(sessionName)
   details.push(online ? `Source ${Number(item.source)}` : "Offline")
-  if (item.self === true) details.push("voce")
+  if (item.self === true) details.push(t("you"))
 
   return (
     <button

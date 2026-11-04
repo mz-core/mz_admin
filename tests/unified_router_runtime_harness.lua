@@ -46,6 +46,15 @@ _G.RegisterKeyMapping = function() end
 _G.RegisterNetEvent = function() end
 _G.AddEventHandler = function() end
 _G.CreateThread = function() end -- nao executa loops de polling no harness
+_G.locale = function(key)
+  local english = {
+    ['menu.s_3b2c8bf51797'] = 'HOME',
+    ['menu.s_32b8840c22ca'] = 'PLAYERS',
+    ['menu.s_f3b86b13dbbc'] = 'Home',
+    ['menu.s_c702ea656c01'] = 'Players'
+  }
+  return english[key] or key
+end
 
 _G.exports = {}
 _G.MZAdminUI = {
@@ -130,6 +139,8 @@ step('Open', function()
   expect(openedTablet.tabs ~= nil and #openedTablet.tabs == 3, 'deveria haver 3 abas (INICIO, JOGADORES, dominio)')
   local ids = {}
   for _, tab in ipairs(openedTablet.tabs) do ids[tab.id] = true end
+  expect(openedTablet.tabs[1].label == 'HOME' and openedTablet.tabs[2].label == 'PLAYERS',
+    'abas nao usam as traducoes do locale')
   expect(ids.main == true and ids.players == true and ids['mz_admin:world'] == true,
     'abas canonicas ausentes')
   expect(ids.admin == nil and ids['mz_admin:root'] == nil, 'hub Administracao ainda esta na rail')
@@ -145,6 +156,7 @@ end)
 step('MAIN por clique', function()
   capturedCallbacks.onNavigate('main')
   expect(views['main'] ~= nil, 'MAIN nao renderizada apos navegacao')
+  expect(views['main'].title == 'Home', 'titulo MAIN nao usa o locale')
 end)
 
 step('recolher MAIN', function()
@@ -154,6 +166,7 @@ end)
 step('JOGADORES (lista)', function()
   capturedCallbacks.onNavigate('players')
   expect(views['players'] ~= nil, 'JOGADORES nao renderizou a lista')
+  expect(views['players'].title == 'Players', 'titulo JOGADORES nao usa o locale')
   expect(views['players'].rows ~= nil and #views['players'].rows == 1, 'lista de jogadores vazia/ausente')
 end)
 

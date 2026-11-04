@@ -24,7 +24,7 @@ local function toggleNoClipAuthorized()
 end
 
 RegisterCommand(Config.NoClipCommand or 'noclip', toggleNoClipAuthorized, false)
-RegisterKeyMapping(Config.NoClipCommand or 'noclip', 'Ativar/desativar noclip administrativo', 'keyboard', '')
+RegisterKeyMapping(Config.NoClipCommand or 'noclip', (type(locale) == 'function' and locale('noclip.s_170910a2b36b') or 'Ativar/desativar noclip administrativo'), 'keyboard', '')
 
 RegisterNetEvent('mz_admin:client:authorizeNoClip', function(allowed, enabled)
   if allowed ~= true then

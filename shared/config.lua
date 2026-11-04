@@ -1,6 +1,13 @@
+local locale = type(GetConvar) == 'function' and tostring(GetConvar('ox:locale', 'pt-br')):lower() or 'pt-br'
+if locale == 'en' or locale == 'en-us' then
+  locale = 'en-us'
+else
+  locale = 'pt-br'
+end
+
 Config = {
-  -- Locale global definido pelo servidor (mz_starter/cfg/base.cfg).
-  Locale = type(GetConvar) == 'function' and GetConvar('locale', 'pt-BR') or 'pt-BR',
+  -- Idioma global replicado pelo servidor; aliases pt e en seguem o inventory.
+  Locale = locale,
 
   -- Permissao global necessaria para usar noclip.
   NoClipPermission = 'staff.noclip',

@@ -71,9 +71,40 @@ A referência local `D:\Mara\server\extras\flight_admin-main` declara LGPL-3.0.
 O frontend MZ permanece uma implementação vanilla independente: não importa o
 backend, eventos ou lógica administrativa da referência.
 
-O idioma do documento herda o convar global `locale` configurado pelo servidor,
-com fallback `pt-BR`. Assim a NUI já recebe `en-US` globalmente quando selecionado;
-os textos funcionais continuam vindo dos módulos/owners que montam cada view.
+O idioma do documento herda o convar replicado `ox:locale`, com fallback `pt-br`.
+Os aliases `pt` e `en` são normalizados para `pt-br` e `en-us`. A NUI recebe
+esse valor no modelo; os textos funcionais ainda dependem dos módulos que montam
+cada view e não estão todos traduzidos.
+
+### Catálogo de permissões Staff
+
+O callback `mz_admin:server:listStaffManagement` consulta o export server-side
+`mz_core:ListStaffManagement`. O campo `catalog` devolve entradas com `code`,
+`label` e `group`; `code` é o identificador estável usado nas decisões e
+alterações de permissões. Os rótulos `label` e grupos `group` atuais vêm do
+catálogo do Core e podem chegar em português independentemente do idioma do
+Admin. Nomes de cargos e outros valores administrados são dados e também não
+devem ser traduzidos automaticamente.
+
+Uma evolução no Core poderia fornecer rótulos localizados pelo `ox:locale`, ou
+chaves estáveis de tradução junto com o catálogo, preservando `code`, `group`
+e os contratos de autorização. O Admin não replica o catálogo de permissões.
+
+### Textos dinâmicos e rótulos técnicos
+
+Identificadores e exemplos estruturais mantêm sua forma original: `Citizen ID`,
+`Account ID`, `Audit ID`, `Whitelist`, `Spawn`, `Staff`, `Status`,
+`Online`/`Offline`, nomes de modelos, coordenadas e valores como `recepcao_01`.
+São identificadores, termos técnicos ou exemplos de dados. Marcas como
+`MZ Admin` também permanecem iguais nos dois idiomas.
+
+O Admin preserva dados fornecidos por outros owners: os campos humanos dos
+incidentes do `mz_banguard`, nomes e categorias do catálogo do `mz_furniture`,
+nomes de organizações e outros dados de `mz_org`, `mz_doors`, `mz_props` e
+`mz_phone`. Motivos históricos, nomes de jogadores e conteúdo inserido por
+usuários permanecem como recebidos. Para localizar esses campos, o respectivo
+owner pode fornecer textos no idioma global ou chaves estáveis, sem duplicar
+seus catálogos no Admin.
 
 ## Homologação FiveM pendente
 

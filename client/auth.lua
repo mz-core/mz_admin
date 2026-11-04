@@ -2,8 +2,8 @@ MZAdminClient = MZAdminClient or {}
 
 local function notifyDenied(reason)
   local message = reason == 'rate_limited'
-    and 'Aguarde um instante antes de repetir esta acao.'
-    or 'Voce nao possui permissao para esta acao.'
+    and (type(locale) == 'function' and locale('errors.rate_limited') or 'Aguarde um instante antes de repetir esta acao.')
+    or (type(locale) == 'function' and locale('auth.s_1bf4aa7d83c0') or 'Voce nao possui permissao para esta acao.')
 
   if type(MZAdminUI) == 'table' then
     MZAdminUI.Notify(message, 'error')
@@ -69,7 +69,7 @@ function MZAdminClient.SearchPlayers(query, filter, page, pageSize)
       page = page or 1,
       pageSize = pageSize or 25,
       hasMore = false,
-      hint = 'Nao foi possivel buscar jogadores agora.'
+      hint = (type(locale) == 'function' and locale('auth.s_b94f4048014c') or 'Nao foi possivel buscar jogadores agora.')
     }
   end
   return response.data

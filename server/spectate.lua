@@ -96,22 +96,22 @@ end
 
 local function notifyDenied(sourceId, message)
   TriggerClientEvent('chat:addMessage', sourceId, {
-    args = { 'Admin', message or 'Spectate negado.' }
+    args = { 'Admin', message or (type(locale) == 'function' and locale('errors.spectate_denied') or 'Spectate negado.') }
   })
 end
 
 local function hierarchyMessage(reason)
-  if reason == 'target_owner' then return 'O Staff Supremo esta protegido.' end
+  if reason == 'target_owner' then return (type(locale) == 'function' and locale('server_messages.s_973bfc122a24') or 'O Staff Supremo esta protegido.') end
   if reason == 'target_higher_or_equal' then
-    return 'Voce nao pode espectar Staff de nivel igual ou superior.'
+    return (type(locale) == 'function' and locale('server_messages.s_06688f7956f9') or 'Voce nao pode espectar Staff de nivel igual ou superior.')
   end
   if reason == 'actor_without_staff_level' then
-    return 'Seu contexto Staff nao possui nivel para espectar este alvo.'
+    return (type(locale) == 'function' and locale('server_messages.s_d3e3a3348d61') or 'Seu contexto Staff nao possui nivel para espectar este alvo.')
   end
   if reason == 'actor_not_loaded' or reason == 'target_not_loaded' then
-    return 'Contexto Staff indisponivel.'
+    return (type(locale) == 'function' and locale('server_messages.s_7f1bd59e7e5b') or 'Contexto Staff indisponivel.')
   end
-  return 'Spectate negado pela hierarquia Staff.'
+  return (type(locale) == 'function' and locale('server_messages.s_60560aab37a8') or 'Spectate negado pela hierarquia Staff.')
 end
 
 local function resolveHierarchy(sourceId, targetId)
@@ -194,10 +194,10 @@ function MZAdminSpectate.Start(sourceId, requestedTarget, expectedCitizenid)
 
   local allowed, permissionReason = MZAdminSecurity.Authorize(sourceId, 'spectate')
   if not allowed then
-    return deny(sourceId, targetId, permissionReason, 'Sem permissao para spectate.')
+    return deny(sourceId, targetId, permissionReason, (type(locale) == 'function' and locale('server_messages.s_2794020323f0') or 'Sem permissao para spectate.'))
   end
   if not online(targetId) then
-    return deny(sourceId, targetId, 'invalid_target', 'Player invalido.')
+    return deny(sourceId, targetId, 'invalid_target', (type(locale) == 'function' and locale('server_messages.s_c3f6ae238137') or 'Player invalido.'))
   end
   local identityMatches, identityReason = MZAdminSecurity.ValidateTargetIdentity(targetId, expectedCitizenid)
   if not identityMatches then
@@ -206,12 +206,12 @@ function MZAdminSpectate.Start(sourceId, requestedTarget, expectedCitizenid)
       targetId,
       identityReason,
       identityReason == 'stale_target'
-        and 'A sessao selecionada mudou de Character. Selecione o jogador novamente.'
-        or 'Nao foi possivel validar a identidade do alvo.'
+        and (type(locale) == 'function' and locale('server_messages.s_3186f3c6df13') or 'A sessao selecionada mudou de Character. Selecione o jogador novamente.')
+        or (type(locale) == 'function' and locale('server_messages.s_ce8bb340f504') or 'Nao foi possivel validar a identidade do alvo.')
     )
   end
   if sourceId == targetId then
-    return deny(sourceId, targetId, 'self_target', 'Voce nao pode espectar a si mesmo.')
+    return deny(sourceId, targetId, 'self_target', (type(locale) == 'function' and locale('server_messages.s_61cd6f6419d3') or 'Voce nao pode espectar a si mesmo.'))
   end
 
   local hierarchyAllowed, hierarchyReason, hierarchy = resolveHierarchy(sourceId, targetId)
@@ -221,18 +221,18 @@ function MZAdminSpectate.Start(sourceId, requestedTarget, expectedCitizenid)
 
   if not current and MZAdminNoClip and MZAdminNoClip.IsEnabled
     and MZAdminNoClip.IsEnabled(sourceId) then
-    return deny(sourceId, targetId, 'noclip_active', 'Desative o noclip antes de usar spectate.', hierarchy)
+    return deny(sourceId, targetId, 'noclip_active', (type(locale) == 'function' and locale('spectate.s_13cd4d1bf44b') or 'Desative o noclip antes de usar spectate.'), hierarchy)
   end
 
   local actorPed = GetPlayerPed(sourceId)
   local target = targetState(targetId)
   if not actorPed or actorPed == 0 or not target then
-    return deny(sourceId, targetId, 'ped_unavailable', 'Ped do Staff ou do alvo indisponivel.', hierarchy)
+    return deny(sourceId, targetId, 'ped_unavailable', (type(locale) == 'function' and locale('server_messages.s_d5dc0dcebf63') or 'Ped do Staff ou do alvo indisponivel.'), hierarchy)
   end
 
   if current then
     if not audit(sourceId, targetId, 'switched', hierarchyReason, hierarchy) then
-      notifyDenied(sourceId, 'Auditoria indisponivel. Troca de alvo cancelada.')
+      notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_d350d6036c3d') or 'Auditoria indisponivel. Troca de alvo cancelada.'))
       return false
     end
     current.target = targetId
@@ -258,7 +258,7 @@ function MZAdminSpectate.Start(sourceId, requestedTarget, expectedCitizenid)
   }
 
   if not audit(sourceId, targetId, 'started', hierarchyReason, hierarchy) then
-    notifyDenied(sourceId, 'Auditoria indisponivel. Spectate cancelado.')
+    notifyDenied(sourceId, (type(locale) == 'function' and locale('server_messages.s_b6251ff28c0f') or 'Auditoria indisponivel. Spectate cancelado.'))
     return false
   end
 

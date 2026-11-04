@@ -13,12 +13,14 @@ files {
   'web/index.html',
   'web/style.css',
   'web/app.js',
+  'locales/*.json',
   'web/logo_s.svg'
 }
 
 shared_scripts {
   '@ox_lib/init.lua',
   'shared/config.lua',
+  'shared/locale.lua',
   'shared/permissions.lua'
 }
 

@@ -99,7 +99,7 @@ end
 local function loadModel(model)
   local hash = type(model) == 'number' and model or joaat(model)
   if not IsModelInCdimage(hash) or not IsModelAVehicle(hash) then
-    return nil, 'Modelo inválido.'
+    return nil, (type(locale) == 'function' and locale('commands.s_410738ea669b') or 'Modelo inválido.')
   end
 
   RequestModel(hash)
@@ -107,7 +107,7 @@ local function loadModel(model)
   while not HasModelLoaded(hash) do
     Wait(0)
     if GetGameTimer() > timeout then
-      return nil, 'Timeout ao carregar modelo.'
+      return nil, (type(locale) == 'function' and locale('commands.s_07c910db127e') or 'Timeout ao carregar modelo.')
     end
   end
 
@@ -205,7 +205,7 @@ end
 local function getWeaponHashFromInput(input)
   local weaponName = normalizeWeaponName(input)
   if not weaponName then
-    return nil, nil, 'Arma inválida.'
+    return nil, nil, (type(locale) == 'function' and locale('commands.s_37309fa78dd8') or 'Arma inválida.')
   end
 
   return joaat(weaponName), weaponName
@@ -217,7 +217,7 @@ end
 
 local function blockNativeWeaponCommand(commandName)
   print(('[mz_admin][weapon_admin_command_blocked] command=%s'):format(tostring(commandName or 'unknown')))
-  notify('Comando de arma nativa desativado. Use o inventario do mz_core para testes de arma.', 'error')
+  notify((type(locale) == 'function' and locale('commands.s_b6b1b73ad929') or 'Comando de arma nativa desativado. Use o inventario do mz_core para testes de arma.'), 'error')
 end
 
 local function giveTestWeapon(weaponInput, ammo)
@@ -225,7 +225,7 @@ local function giveTestWeapon(weaponInput, ammo)
   local ped = PlayerPedId()
   local weaponHash, weaponName, err = getWeaponHashFromInput(weaponInput)
   if not weaponHash then
-    return false, err or 'Arma inválida.'
+    return false, err or (type(locale) == 'function' and locale('commands.s_37309fa78dd8') or 'Arma inválida.')
   end
 
   ammo = tonumber(ammo) or Config.DefaultWeaponAmmo or 250
@@ -434,7 +434,7 @@ RegisterCommand(Config.Commands.loc or 'loc', function()
     multiline = true,
     args = {
       'LOC',
-      ('CHÃO / MARKER:\n%s\n%s\n%s\n\nENTIDADE / TP:\n%s\n%s\n%s'):format(
+      ((type(locale) == 'function' and locale('commands.s_df2030a638c9') or 'CHÃO / MARKER:\n%s\n%s\n%s\n\nENTIDADE / TP:\n%s\n%s\n%s')):format(
         markerText.vector3,
         markerText.vector4,
         markerText.raw,
@@ -452,13 +452,13 @@ RegisterCommand(Config.Commands.tp or 'tp', function(_, args)
   local h = tonumber(args[4])
 
   if not x or not y or not z then
-    notify('Uso: /tp x y z [heading]', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_f1237e812e33') or 'Uso: /tp x y z [heading]'), 'error')
     return
   end
 
   local entity = getTeleportEntity()
   if teleportEntity(entity, vector3(x, y, z), h) then
-    notify(('Teleportado para %.2f, %.2f, %.2f'):format(x, y, z), 'success')
+    notify(((type(locale) == 'function' and locale('commands.s_3fb7a2f5ab0f') or 'Teleportado para %.2f, %.2f, %.2f')):format(x, y, z), 'success')
   end
 end, false)
 
@@ -466,7 +466,7 @@ RegisterCommand(Config.Commands.tpm or 'tpm', function()
   if not authorize('tpm') then return end
   local waypoint = GetFirstBlipInfoId(8)
   if not DoesBlipExist(waypoint) then
-    notify('Nenhum waypoint marcado no mapa.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_57db87242c4f') or 'Nenhum waypoint marcado no mapa.'), 'error')
     return
   end
 
@@ -489,13 +489,13 @@ RegisterCommand(Config.Commands.tpm or 'tpm', function()
   local finalZ = foundGround and (groundZ + 1.0) or 100.0
   SetEntityCoordsNoOffset(entity, blipCoords.x, blipCoords.y, finalZ, false, false, false)
   DoScreenFadeIn(150)
-  notify('Teleportado para o waypoint.', 'success')
+  notify((type(locale) == 'function' and locale('commands.s_59d7042a4256') or 'Teleportado para o waypoint.'), 'success')
 end, false)
 
 RegisterCommand(Config.Commands.gotoPlayer or 'goto', function(_, args)
   local target = tonumber(args[1])
   if not target then
-    notify('Uso: /goto id', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_53d059d6c6dd') or 'Uso: /goto id'), 'error')
     return
   end
   TriggerServerEvent('mz_admin:server:gotoPlayer', target)
@@ -504,7 +504,7 @@ end, false)
 RegisterCommand(Config.Commands.bringPlayer or 'bring', function(_, args)
   local target = tonumber(args[1])
   if not target then
-    notify('Uso: /bring id', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_fd0ef32facbf') or 'Uso: /bring id'), 'error')
     return
   end
   TriggerServerEvent('mz_admin:server:bringPlayer', target)
@@ -514,16 +514,16 @@ RegisterCommand(Config.Commands.kickPlayer or 'kick', function(_, args)
   local target = tonumber(args[1])
   local reason = table.concat(args, ' ', 2):gsub('^%s+', ''):gsub('%s+$', '')
   if not target or reason == '' then
-    notify('Uso: /kick id motivo', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_358b2494e55d') or 'Uso: /kick id motivo'), 'error')
     return
   end
   if not lib or not lib.callback or type(lib.callback.await) ~= 'function' then
-    notify('Nao foi possivel validar a identidade do alvo.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_ce8bb340f504') or 'Nao foi possivel validar a identidade do alvo.'), 'error')
     return
   end
   local ok, response = pcall(lib.callback.await, 'mz_admin:server:resolveTargetIdentity', false, target, 'kick')
   if not ok or type(response) ~= 'table' or response.ok ~= true or not response.citizenid then
-    notify('Nao foi possivel validar a identidade do alvo.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_ce8bb340f504') or 'Nao foi possivel validar a identidade do alvo.'), 'error')
     return
   end
   TriggerServerEvent('mz_admin:server:kickPlayer', target, reason, response.citizenid)
@@ -546,14 +546,14 @@ RegisterCommand(Config.Commands.deleteVehicle or 'dv', function(_, args)
   end
 
   if vehicle == 0 or not DoesEntityExist(vehicle) then
-    notify('Nenhum veículo encontrado.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_0a5c82a75645') or 'Nenhum veículo encontrado.'), 'error')
     return
   end
 
   if deleteVehicle(vehicle) then
-    notify('Veículo deletado.', 'success')
+    notify((type(locale) == 'function' and locale('commands.s_661bf1cd030d') or 'Veículo deletado.'), 'success')
   else
-    notify('Não foi possível deletar o veículo.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_a14d8cb49068') or 'Não foi possível deletar o veículo.'), 'error')
   end
 end, false)
 
@@ -561,13 +561,13 @@ RegisterCommand(Config.Commands.spawnVehicle or 'car', function(_, args)
   if not authorize('spawnVehicle') then return end
   local model = args[1]
   if not model or model == '' then
-    notify('Uso: /car modelo', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_1e5fbc98a99d') or 'Uso: /car modelo'), 'error')
     return
   end
 
   local hash, err = loadModel(model)
   if not hash then
-    notify(err or 'Modelo inválido.', 'error')
+    notify(err or (type(locale) == 'function' and locale('commands.s_410738ea669b') or 'Modelo inválido.'), 'error')
     return
   end
 
@@ -584,7 +584,7 @@ RegisterCommand(Config.Commands.spawnVehicle or 'car', function(_, args)
 
   local vehicle = CreateVehicle(hash, spawnCoords.x, spawnCoords.y, spawnCoords.z, heading, true, false)
   if vehicle == 0 then
-    notify('Falha ao criar veículo.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_54acf93724fc') or 'Falha ao criar veículo.'), 'error')
     SetModelAsNoLongerNeeded(hash)
     return
   end
@@ -595,7 +595,7 @@ RegisterCommand(Config.Commands.spawnVehicle or 'car', function(_, args)
   SetVehRadioStation(vehicle, 'OFF')
   SetVehicleRadioEnabled(vehicle, false)
   SetModelAsNoLongerNeeded(hash)
-  notify(('Veículo %s criado.'):format(model), 'success')
+  notify(((type(locale) == 'function' and locale('commands.s_0cba23b6fc9e') or 'Veículo %s criado.')):format(model), 'success')
 end, false)
 
 RegisterCommand(Config.Commands.fixVehicle or 'fix', function()
@@ -606,7 +606,7 @@ RegisterCommand(Config.Commands.fixVehicle or 'fix', function()
   end
 
   if vehicle == 0 or not DoesEntityExist(vehicle) then
-    notify('Nenhum veículo para reparar.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_236b8bb9fa5f') or 'Nenhum veículo para reparar.'), 'error')
     return
   end
 
@@ -615,7 +615,7 @@ RegisterCommand(Config.Commands.fixVehicle or 'fix', function()
   SetVehicleDirtLevel(vehicle, 0.0)
   SetVehicleEngineHealth(vehicle, 1000.0)
   SetVehiclePetrolTankHealth(vehicle, 1000.0)
-  notify('Veículo reparado.', 'success')
+  notify((type(locale) == 'function' and locale('commands.s_9926046d391f') or 'Veículo reparado.'), 'success')
 end, false)
 
 
@@ -629,19 +629,19 @@ RegisterCommand(Config.Commands.tuneVehicle or 'tuning', function()
   end
 
   if vehicle == 0 or not DoesEntityExist(vehicle) then
-    notify('Nenhum veículo encontrado para tunar.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_d34965e54efd') or 'Nenhum veículo encontrado para tunar.'), 'error')
     return
   end
 
   local ok, reason = fullRandomTune(vehicle)
   if not ok then
     notify(reason == 'no_control'
-      and 'Não foi possível obter controle do veículo.'
-      or 'Não foi possível aplicar o tuning.', 'error')
+      and (type(locale) == 'function' and locale('commands.s_ee5c344b16fa') or 'Não foi possível obter controle do veículo.')
+      or (type(locale) == 'function' and locale('commands.s_f3d4a7fdec07') or 'Não foi possível aplicar o tuning.'), 'error')
     return
   end
 
-  notify('Tuning aplicado: performance máxima + visual aleatório.', 'success')
+  notify((type(locale) == 'function' and locale('commands.s_17dbefc53980') or 'Tuning aplicado: performance máxima + visual aleatório.'), 'success')
 end, false)
 
 RegisterCommand(Config.Commands.heal or 'heal', function(_, args)
@@ -668,17 +668,17 @@ RegisterCommand(Config.Commands.weapon or 'arma', function(_, args)
   local ammo = tonumber(args[2]) or Config.DefaultWeaponAmmo or 250
 
   if not weaponInput or weaponInput == '' or weaponInput == 'lista' or weaponInput == 'list' then
-    notify(('Uso: /%s nome [municao]. Exemplos: pistol, smg, carbinerifle, shotgun. Lista rápida: %s'):format(Config.Commands.weapon or 'arma', weaponListText()), 'inform')
+    notify(((type(locale) == 'function' and locale('commands.s_20e8d6dfb42b') or 'Uso: /%s nome [municao]. Exemplos: pistol, smg, carbinerifle, shotgun. Lista rápida: %s')):format(Config.Commands.weapon or 'arma', weaponListText()), 'inform')
     return
   end
 
   local ok, weaponName, finalAmmo = giveTestWeapon(weaponInput, ammo)
   if not ok then
-    notify(weaponName or 'Arma inválida.', 'error')
+    notify(weaponName or (type(locale) == 'function' and locale('commands.s_37309fa78dd8') or 'Arma inválida.'), 'error')
     return
   end
 
-  notify(('Arma %s entregue com %s munições.'):format(weaponName, finalAmmo), 'success')
+  notify(((type(locale) == 'function' and locale('commands.s_a10810a0df2a') or 'Arma %s entregue com %s munições.')):format(weaponName, finalAmmo), 'success')
 end, false)
 
 RegisterCommand(Config.Commands.weaponAlias or 'weapon', function(_, args)
@@ -701,7 +701,7 @@ RegisterCommand(Config.Commands.weaponKit or 'armas', function(_, args)
   local kit = TestWeaponKits[kitName]
 
   if not kit then
-    notify('Kit inválido. Use: /armas basic, /armas police ou /armas heavy', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_0de59d56f5ec') or 'Kit inválido. Use: /armas basic, /armas police ou /armas heavy'), 'error')
     return
   end
 
@@ -715,7 +715,7 @@ RegisterCommand(Config.Commands.weaponKit or 'armas', function(_, args)
     end
   end
 
-  notify(('Kit %s entregue com %s armas.'):format(kitName, given), 'success')
+  notify(((type(locale) == 'function' and locale('commands.s_8669339d544e') or 'Kit %s entregue com %s armas.')):format(kitName, given), 'success')
 end, false)
 
 RegisterCommand(Config.Commands.clearWeapons or 'limpararmas', function()
@@ -726,7 +726,7 @@ RegisterCommand(Config.Commands.clearWeapons or 'limpararmas', function()
   end
 
   RemoveAllPedWeapons(PlayerPedId(), true)
-  notify('Armas removidas.', 'success')
+  notify((type(locale) == 'function' and locale('commands.s_199a35958bba') or 'Armas removidas.'), 'success')
 end, false)
 
 RegisterCommand(Config.Commands.revive or 'revive', function(_, args)
@@ -753,14 +753,14 @@ RegisterCommand(Config.Commands.godMode or 'godmode', function()
   if not lib or not lib.callback or type(lib.callback.await) ~= 'function' then return end
   local ok, response = pcall(lib.callback.await, 'mz_admin:server:toggleGodMode', false)
   if not ok or type(response) ~= 'table' or response.ok ~= true then
-    notify('Nao foi possivel alterar o godmode.', 'error')
+    notify((type(locale) == 'function' and locale('commands.s_4b5adf61bf7d') or 'Nao foi possivel alterar o godmode.'), 'error')
     return
   end
   local ped = PlayerPedId()
   local enabled = response.enabled == true
   SetPlayerInvincible(PlayerId(), enabled)
   SetEntityInvincible(ped, enabled)
-  notify(enabled and 'Godmode ativado.' or 'Godmode desativado.', enabled and 'success' or 'inform')
+  notify(enabled and (type(locale) == 'function' and locale('commands.s_c35c9199ba08') or 'Godmode ativado.') or (type(locale) == 'function' and locale('commands.s_47fc69c8b4dc') or 'Godmode desativado.'), enabled and 'success' or 'inform')
 end, false)
 
 -- Godmode is server-authorized but applied through client natives. Never leave
@@ -783,16 +783,16 @@ end)
 
 RegisterNetEvent('mz_admin:client:stateActionConfirmed', function(action, value)
   if action == 'heal' then
-    notify('Vida, fome e sede restauradas.', 'success')
+    notify((type(locale) == 'function' and locale('commands.s_e3cb87b46d0b') or 'Vida, fome e sede restauradas.'), 'success')
   elseif action == 'revive' then
-    notify('Revive canonico concluido.', 'success')
+    notify((type(locale) == 'function' and locale('commands.s_aa18f2b84fb0') or 'Revive canonico concluido.'), 'success')
   elseif action == 'armor' then
-    notify(('Colete canonico definido para %s.'):format(tonumber(value) or 0), 'success')
+    notify(((type(locale) == 'function' and locale('commands.s_ce83d2e2a25d') or 'Colete canonico definido para %s.')):format(tonumber(value) or 0), 'success')
   elseif action == 'medical_dead' then
-    notify(('Estado dead aplicado ao ID %s.'):format(tonumber(value) or 0), 'success')
+    notify(((type(locale) == 'function' and locale('commands.s_4d5e419460d2') or 'Estado dead aplicado ao ID %s.')):format(tonumber(value) or 0), 'success')
   elseif action == 'medical_recovery' then
-    notify(('Recovery medico aplicado ao ID %s.'):format(tonumber(value) or 0), 'success')
+    notify(((type(locale) == 'function' and locale('commands.s_ffffbe9aba91') or 'Recovery medico aplicado ao ID %s.')):format(tonumber(value) or 0), 'success')
   elseif action == 'medical_cancel' then
-    notify(('Operacao medica cancelada para ID %s.'):format(tonumber(value) or 0), 'success')
+    notify(((type(locale) == 'function' and locale('commands.s_b347a3f5e66c') or 'Operacao medica cancelada para ID %s.')):format(tonumber(value) or 0), 'success')
   end
 end)

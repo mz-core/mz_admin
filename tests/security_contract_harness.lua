@@ -43,6 +43,8 @@ local hierarchyContext = {
 }
 local capturedThreads = {}
 
+function GetConvarInt(_, defaultValue) return defaultValue end
+
 local function expect(condition, message)
   if not condition then error(message, 2) end
 end
