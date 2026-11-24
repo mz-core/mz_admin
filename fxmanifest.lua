@@ -5,7 +5,7 @@ lua54 'yes'
 name 'mz_admin'
 author 'Mazus'
 description 'Admin tools - Noclip, etc'
-version '0.3.1'
+version '0.3.3'
 
 ui_page 'web/index.html'
 
