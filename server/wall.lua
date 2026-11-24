@@ -3,9 +3,11 @@ MZAdminWall = MZAdminWall or {}
 local watchers = {}
 local staffTagCache = {}
 local identityCache = {}
+local riskCache = {}
 local nextAuthorizationAt = {}
 local STAFF_TAG_TTL_MS = 2000
 local IDENTITY_TTL_MS = 2000
+local RISK_TTL_MS = 2000
 
 local function normalizeSource(value)
   value = tonumber(value)
@@ -181,6 +183,33 @@ local function filteredSnapshot(snapshot, watcherBucket)
   return result
 end
 
+local function withRisk(snapshot, watcher, now)
+  local cached = riskCache[watcher]
+  if not cached or now >= cached.expiresAt then
+    local ok, response = pcall(function()
+      return exports['mz_banguard']:GetSecurityAlertSummary(watcher)
+    end)
+    local summary = ok and type(response) == 'table' and response.ok == true
+      and type(response.data) == 'table' and response.data.summary or nil
+    cached = { players = type(summary) == 'table' and summary.players or {}, expiresAt = now + RISK_TTL_MS }
+    riskCache[watcher] = cached
+  end
+  local result = {}
+  for _, row in ipairs(snapshot) do
+    local copy = {}
+    for key, value in pairs(row) do copy[key] = value end
+    for _, player in ipairs(type(cached.players) == 'table' and cached.players or {}) do
+      if type(player.riskScore) == 'number' and ((row.citizenid and row.citizenid ~= ''
+        and player.citizenid == row.citizenid) or (player.citizenid == '' and player.source == row.id)) then
+        copy.riskScore, copy.riskBand = player.riskScore, player.riskBand
+        break
+      end
+    end
+    result[#result + 1] = copy
+  end
+  return result
+end
+
 lib.callback.register('mz_admin:server:toggleWall', function(source)
   local sourceId = normalizeSource(source)
   if not sourceId then return { ok = false, error = 'invalid_source' } end
@@ -238,10 +267,15 @@ function MZAdminWall.Tick(now)
 
       if watchers[watcher] == true then
         local bucket = tonumber(GetPlayerRoutingBucket(watcher)) or 0
+        local rows = filteredSnapshot(snapshot, bucket)
+        if GetResourceState('mz_banguard') == 'started'
+          and MZAdminSecurity.HasGlobalPermission(watcher, MZAdminPermissions.securityAlertsView) then
+          rows = withRisk(rows, watcher, now)
+        end
         TriggerClientEvent(
           'mz_admin:client:updateWall',
           watcher,
-          filteredSnapshot(snapshot, bucket),
+          rows,
           bucket
         )
       end
@@ -265,9 +299,11 @@ AddEventHandler('playerDropped', function()
   nextAuthorizationAt[sourceId] = nil
   staffTagCache[sourceId] = nil
   identityCache[sourceId] = nil
+  riskCache[sourceId] = nil
 end)
 
 AddEventHandler('onResourceStop', function(resource)
+  if resource == 'mz_banguard' then riskCache = {} end
   if resource ~= GetCurrentResourceName() then return end
   for watcher in pairs(watchers) do
     TriggerClientEvent('mz_admin:client:setWallState', watcher, false)

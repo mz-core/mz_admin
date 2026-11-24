@@ -30,6 +30,8 @@ local function color(name, fallback)
   return type(value) == 'table' and value or fallback
 end
 
+local riskColors = { green = '~g~', yellow = '~y~', orange = '~o~', red = '~r~' }
+
 local function vehicleLabel(vehicle)
   if not vehicle or vehicle == 0 then return nil end
   local model = GetEntityModel(vehicle)
@@ -243,6 +245,9 @@ CreateThread(function()
               )
               local line2 = ('HP:%s  AR:%s  |  %s'):format(healthText, armorText, movementText)
               local line3 = ('%s  |  %s  |  %.0fm'):format(bucketText, weaponText, distance)
+              if type(row.riskScore) == 'number' and riskColors[row.riskBand] then
+                line3 = line3 .. ('  |  %s%s~s~'):format(riskColors[row.riskBand], tostring(row.riskScore))
+              end
 
               if setting('drawLines', true) == true
                 and distance <= (tonumber(setting('lineDistance', 200.0)) or 200.0) then
